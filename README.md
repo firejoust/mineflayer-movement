@@ -1,2 +1,2 @@
-# mineflayer-steer
- A mineflayer plugin enabling for basic movement through dynamic obstacle avoidance and steering  
+# mineflayer-movement
+A lighter solution to basic player movement through raycast-driven obstacle avoidance and steering
