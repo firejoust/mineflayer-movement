@@ -1,2 +1,3 @@
 - [Pathfinding VS Obstacle Avoidance](https://gamedev.stackexchange.com/questions/63793/do-i-need-path-finding-to-make-ai-avoid-obstacles)
 - [Autonomous Steering Behaviours](https://www.red3d.com/cwr/steer/)
+- [Collision Behavior Lectures](https://www.youtube.com/channel/UCjtW5yb0M9Czoyl0Db__Kcg)
