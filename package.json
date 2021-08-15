@@ -1,0 +1,29 @@
+{
+  "name": "mineflayer-movement",
+  "version": "0.0.1",
+  "description": "A lighter solution to basic player movement through raycast-driven obstacle avoidance and steering",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Camezza/mineflayer-movement.git"
+  },
+  "keywords": [
+    "node",
+    "mineflayer",
+    "minecraft",
+    "ai",
+    "javascript"
+  ],
+  "author": "Firejoust",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Camezza/mineflayer-movement/issues"
+  },
+  "homepage": "https://github.com/Camezza/mineflayer-movement#readme",
+  "dependencies": {
+    "vec3": "^0.1.7"
+  }
+}
