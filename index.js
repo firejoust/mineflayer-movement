@@ -1,11 +1,27 @@
+/**
+ * @typedef dangerOptions
+ * @property multiplier
+ * @property maxX
+ * @property maxY
+ */
+
+/**
+ * @typedef distanceOptions
+ * @property multiplier
+ * @property maxX
+ * @property rayTotal (ODD)
+ */
+
+/**
+ * @typedef proximityOptions
+ * @property multiplier
+ */
+
 function inject(bot, options) {
     bot.movement = new plugin(bot, options);
 }
 
 class plugin {
-    #proximity_multiplier = 1;
-    #distance_multilier = 0.8;
-    #direction_multiplier = 0.5;
     constructor(bot, options) {
         this.bot = bot;
         this.options = options;
