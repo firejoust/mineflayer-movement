@@ -12,11 +12,9 @@ class costHeuristic {
         this.bot = bot;
     }
 
-    // a ratio from 0 - 1. Generally cheaper = safer
+    // a ratio from 0 - 1, multiplied by the heuristic weighting. Generally cheaper = safer
     determineCost(yaw, destination) {
-        if (!this.bot) throw Error("No client session has been assigned!");
-        let d = destination.minus(this.bot.entity.position);
-        let r = Math.abs(yaw / (Math.atan2(d.z, d.x) - Math.PI))
-        return this.weighting * r;
+        if (!this.bot) throw Error("No client has been assigned!");
+        return 1 * this.weighting;
     }
 }
