@@ -27,7 +27,7 @@ class plugin {
             let a = yaw + (r/rl) * 2 * Math.PI;
             let c = 0; // total cost
 
-            // find the total cost from applying heuristics
+            // find the total cost by applying heuristics
             for (let h of heuristics) {
                 c += h.determineCost(a, destination);
             }
