@@ -9,11 +9,12 @@ class proximityHeuristic extends costHeuristic {
 
     determineCost(yaw, destination) {
         let d = destination.minus(this.bot.entity.position);
-        let r = (Math.atan2(d.z, d.x) - Math.PI) - yaw;
-        return this.weighting * Math.abs(r/Math.PI); // get a ratio of required yaw / current yaw
-    }
-
-    determineCost(yaw, destination) {
-
+        let a = Math.atan2(d.z, d.x);
+        // use circle vectors to find a ratio (-2 < difference < 2)
+        let rx = Math.abs(Math.cos(a) - Math.cos(yaw))/2;
+        let ry = Math.abs(Math.sin(a) - Math.sin(yaw))/2;
+        // average the ratio to determine a cost based on the goal difference
+        let rt = (rx+ry)/2;
+        return this.weighting * (1 - rt);
     }
 }
