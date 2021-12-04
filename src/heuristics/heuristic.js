@@ -9,14 +9,15 @@ class costHeuristic {
         this.weighting = weighting;
         this.bot = null;
     }
+    
+    set bot(bot) {
+        assert.ok(!this.bot, "Client instance has already been assigned to heuristic.");
+        this.bot = bot;
+    }
 
     get #bot() {
         assert.ok(this.bot, "No client instance has been assigned to heuristic.");
         return this.bot;
-    }
-
-    assignClient(bot) {
-        this.bot = bot;
     }
 
     // a ratio from 0 - 1, multiplied by the heuristic weighting. Generally higher = safer

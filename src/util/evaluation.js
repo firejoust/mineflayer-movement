@@ -1,3 +1,7 @@
+/*
+**  All of these operations assume that "costs" and "angles" are corelate
+*/
+
 function cheapest(costs, angles) {
     let c;
     for (let i = 0, il = costs.length; i < il; i++) {

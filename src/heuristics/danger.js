@@ -1,5 +1,5 @@
 /*
-**  Determines how dangerous the terrain is in a certain direction.
+**  Determines how dangerous the terrain is in a certain direction
 */
 
 class dangerHeuristic extends costHeuristic {
