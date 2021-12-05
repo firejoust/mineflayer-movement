@@ -5,24 +5,21 @@
 */
 
 class costHeuristic {
+    bot = null;
+
     constructor(weighting) {
-        this.weighting = weighting;
-        this.bot = null;
-    }
-    
-    set bot(bot) {
-        assert.ok(!this.bot, "Client instance has already been assigned to heuristic.");
-        this.bot = bot;
+        this.weighting = weighting || 1;
     }
 
-    get #bot() {
-        assert.ok(this.bot, "No client instance has been assigned to heuristic.");
-        return this.bot;
+    setClient(bot) {
+        this.bot = bot;
     }
 
     // a ratio from 0 - 1, multiplied by the heuristic weighting. Generally higher = safer
     determineCost(yaw, destination) {
-        if (this.#bot) return this.weighting;
-        // falsey case will stop runtime
+        assert.ok(yaw && destination);
+        return this.weighting;
     }
 }
+
+module.exports = costHeuristic;

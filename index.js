@@ -8,28 +8,29 @@ class plugin {
 
     steerAngle(destination, heuristics, options) {
         let rotations = options.rotations || 8; // by default, calculate heuristics for 8 rotational angles
-        let eval = options.evaluation || 'cheapest'; // can also be 'average'
+        let method = options.evaluation || 'cheapest'; // can also be 'average'
 
         assert.ok(heuristics.length > 0, "At least one heuristic must be specified.");
         assert.ok(rotations > 0, "Rotations must be higher than zero.");
-        assert.ok(evaluation[eval], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
+        assert.ok(evaluation[method], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
 
         // assign bot class required to calculate heuristic costs
         for (let h of heuristics) {
-            h.assignClient(this.bot);
+            h.setClient(this.bot);
         }
 
         let angles = [];
         let costs = [];
 
         // calculate the cost of each yaw rotation
-        for (let r = 0, yaw = this.bot.yaw + Math.PI; r < rotations; r++) {
-            let a = yaw + (r/rl) * 2 * Math.PI;
+        for (let r = 0, yaw = this.bot.entity.yaw + Math.PI; r < rotations; r++) {
+            let a = yaw + (r/rotations) * 2 * Math.PI;
             let c = 0; // total cost
 
             // find the total cost by applying heuristics
             for (let h of heuristics) {
                 c += h.determineCost(a, destination);
+                console.log(a);
             }
 
             angles.push(a);
@@ -37,7 +38,7 @@ class plugin {
         }
 
         // find the optimal angle from costs
-        return evaluation[eval](costs, angles);
+        return evaluation[method](costs, angles);
     }
 }
 

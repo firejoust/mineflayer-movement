@@ -1,3 +1,4 @@
+const costHeuristic = require("./heuristic");
 /*
 **  Determines how dangerous the terrain is in a certain direction
 */
@@ -9,3 +10,5 @@ class dangerHeuristic extends costHeuristic {
         this.depth = depth;
     }
 }
+
+module.exports = dangerHeuristic;

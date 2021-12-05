@@ -1,3 +1,5 @@
+const costHeuristic = require("./heuristic");
+
 /*
 **  Determines how clear the terrain is in a certain direction.
 */
@@ -9,3 +11,5 @@ class distanceHeuristic extends costHeuristic {
         this.count = count;
     }
 }
+
+module.exports = distanceHeuristic;
