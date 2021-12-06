@@ -48,9 +48,9 @@ function inject(bot) {
 module.exports = {
     plugin: inject,
     heuristics: {
-        genericHeuristic: require(`./src/heuristics/heuristic`),
-        dangerHeuristic: require(`./src/heuristics/danger`),
-        distanceHeuristic: require(`./src/heuristics/distance`),
-        proximityHeuristic: require(`./src/heuristics/proximity`),
+        generic: require(`./src/heuristics/generic`),
+        danger: require(`./src/heuristics/danger`),
+        distance: require(`./src/heuristics/distance`),
+        proximity: require(`./src/heuristics/proximity`),
     }
 }

@@ -1,10 +1,10 @@
-const costHeuristic = require("./heuristic");
+const genericHeuristic = require("./generic");
 
 /*
 **  Determines the angular ratio from a direction to the destination
 */
 
-class proximityHeuristic extends costHeuristic {
+class proximityHeuristic extends genericHeuristic {
     constructor(weighting) {
         super(weighting);
     }
