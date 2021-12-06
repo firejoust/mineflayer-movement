@@ -5,7 +5,7 @@
 function cheapest(costs, angles) {
     let c;
     for (let i = 0, il = costs.length; i < il; i++) {
-        if (!c || costs[i] > c[i]) c = i;
+        if (typeof c === "undefined" || costs[i] > costs[c]) c = i;
     }
     return angles[c];
 }

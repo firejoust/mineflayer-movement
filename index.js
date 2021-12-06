@@ -23,14 +23,13 @@ class plugin {
         let costs = [];
 
         // calculate the cost of each yaw rotation
-        for (let r = 0, yaw = this.bot.entity.yaw + Math.PI; r < rotations; r++) {
+        for (let r = 0, yaw = this.bot.entity.yaw; r < rotations; r++) {
             let a = yaw + (r/rotations) * 2 * Math.PI;
             let c = 0; // total cost
 
             // find the total cost by applying heuristics
             for (let h of heuristics) {
                 c += h.determineCost(a, destination);
-                console.log(a);
             }
 
             angles.push(a);
