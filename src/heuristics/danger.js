@@ -4,10 +4,12 @@ const genericHeuristic = require("./generic");
 */
 
 class dangerHeuristic extends genericHeuristic {
-    constructor(weighting, radius, depth) {
+    constructor(weighting, options) {
         super(weighting);
-        this.radius = radius;
-        this.depth = depth;
+        if (options) {
+            this.radius = options.radius || 4;
+            this.depth = options.depth || 4;
+        }
     }
 }
 

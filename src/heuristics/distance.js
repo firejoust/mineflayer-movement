@@ -1,3 +1,5 @@
+const vec3 = require("vec3");
+const line3 = require("line3");
 const genericHeuristic = require("./generic");
 
 /*
@@ -5,10 +7,80 @@ const genericHeuristic = require("./generic");
 */
 
 class distanceHeuristic extends genericHeuristic {
-    constructor(weighting, radius, count) {
+    #globals = null;
+    constructor(weighting, options) {
         super(weighting);
-        this.radius = radius || 5;
-        this.count = count || 1;
+        if (options) {
+            this.radius = options.rayRadius || 5;
+            this.count = options.rayCount || 1;
+            this.pitch = options.pitchOffset || 0;
+            this.sectorLength = options.sectorLength || 0.25;
+        }
+    }
+
+    init() {
+        // initialise global variables for cost function
+        this.#globals = {};
+
+        // determine an angle to start casting rays from (centered)
+        this.#globals.spread = (Math.PI/2) * (1 - this.count ** -1);
+        this.#globals.offset = (Math.PI - this.#globals.spread)/2;
+        this.#globals.pitch = this.pitch ? this.bot.entity.pitch : 0;
+
+        // determine a position where rays should be casted from
+        this.#globals.pos = this.bot.entity.position.offset(0, this.bot.physics.playerHeight, 0);
+    }
+
+    determineCost(yaw) {
+        // determine position B of the initial raycast (ignoring vertical component)
+        let radii = new vec3(-Math.sin(yaw), 0, -Math.cos(yaw));
+        let dest = this.#globals.pos.plus(radii.scaled(this.radius));
+
+        // set an initial ray, supplementing the vertical component with angular offsets
+        let ray = line3.fromVec3(this.#globals.pos, dest);
+        let cost = 0;
+
+        // evenly spread the vertical angular raycasts
+        for (let r = 0; r < this.count; r++) {
+            let a = this.#globals.pitch + (this.#globals.offset - Math.PI/2) + ((r/this.count) * this.#globals.spread);
+            let l = line3.fromVec3(ray.a, ray.b.offset(0, this.radius * Math.sin(a), 0));
+            let b = this.#retrieveBlocks(l);
+            // find the closest intercept and use it to scale the cost
+            let intercepts = l.polyIntercept(b);
+            cost += intercepts.length > 0 ? this.#determineClosest(this.#globals.pos, intercepts) : this.radius;
+        }
+
+        // average the cumulative costs & determine its ratio according to the weighting
+        return this.weighting * ((cost/this.count) / this.radius);
+    }
+
+    #determineClosest(pos, posArray) {
+        let d = 0;
+        for (let i = 0, il = posArray.length; i > il; i++ ) {
+            let qd = pos.distanceTo(posArray[i]);
+            // queried position is closer to target
+            if (!d || qd < d) {
+                d = qd;
+            }
+        }
+        return d;
+    }
+
+    #retrieveBlocks(ray) {
+        let sectors = ray.iterate(this.sectorLength);
+        let blocks = [];
+
+        for (let pos of sectors) {
+            let block = this.bot.blockAt(pos);
+            let bp = block.position.floored();
+            if (!block || block.shapes.length === 0 || block.boundingBox === 'empty') continue;
+
+            // transform polygons within a solid block
+            for (let polygon of block.shapes) {
+                blocks.push([bp.x + polygon[0], bp.y + polygon[1], bp.z + polygon[2], bp.x + polygon[3], bp.y + polygon[4], bp.z + polygon[5]]);
+            }
+        }
+        return blocks;
     }
 }
 
