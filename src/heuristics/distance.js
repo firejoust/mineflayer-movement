@@ -72,8 +72,8 @@ class distanceHeuristic extends genericHeuristic {
 
         for (let pos of sectors) {
             let block = this.bot.blockAt(pos);
-            let bp = block.position.floored();
             if (!block || block.shapes.length === 0 || block.boundingBox === 'empty') continue;
+            let bp = block.position.floored();
 
             // transform polygons within a solid block
             for (let polygon of block.shapes) {
