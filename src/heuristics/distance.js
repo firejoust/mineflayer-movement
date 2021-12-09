@@ -32,7 +32,7 @@ class distanceHeuristic extends genericHeuristic {
     }
 
     determineCost(yaw) {
-        // determine position B of the initial raycast (ignoring vertical component)
+        // find end of raycast
         let radii = new vec3(-Math.sin(yaw), 0, -Math.cos(yaw));
         let dest = this.#globals.pos.plus(radii.scaled(this.radius));
 
@@ -47,14 +47,14 @@ class distanceHeuristic extends genericHeuristic {
             let b = this.#retrieveBlocks(l);
             // find the closest intercept and use it to scale the cost
             let intercepts = l.polyIntercept(b);
-            cost += intercepts.length > 0 ? this.#determineClosest(this.#globals.pos, intercepts) : this.radius;
+            cost += intercepts.length > 0 ? this.#closestDistance(this.#globals.pos, intercepts) : this.radius;
         }
 
         // average the cumulative costs & determine its ratio according to the weighting
-        return this.weighting * ((cost/this.count) / this.radius);
+        return this.weighting * (cost/this.count) / this.radius;
     }
 
-    #determineClosest(pos, posArray) {
+    #closestDistance(pos, posArray) {
         let d = 0;
         for (let i = 0, il = posArray.length; i > il; i++ ) {
             let qd = pos.distanceTo(posArray[i]);
