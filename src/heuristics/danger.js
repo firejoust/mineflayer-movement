@@ -21,7 +21,7 @@ class dangerHeuristic extends genericHeuristic {
 
     init() {
         this.#globals = {};
-        this.#globals.pos = this.bot.entity.position.offset(0, 0, 0);
+        this.#globals.pos = this.bot.entity.position;
     }
 
     determineCost(yaw) {
