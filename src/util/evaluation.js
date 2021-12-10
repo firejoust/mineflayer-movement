@@ -1,7 +1,9 @@
 /*
-**  All of these operations assume that "costs" and "angles" are corelate
+**  A collection of functions which find the best angle, accounting for all directional costs
+**  - All of these operations assume that "costs" and "angles" have been sorted
 */
 
+// gets the cheapest cost and therefore the safest direction
 function cheapest(costs, angles) {
     let c;
     for (let i = 0, il = costs.length; i < il; i++) {
@@ -10,7 +12,8 @@ function cheapest(costs, angles) {
     return angles[c];
 }
 
-function average(costs, angles) { 
+// accounts for all costs and averages them to find a suitable direction
+function average(costs, angles) {
     let x, z;
     x = z = 0;
 

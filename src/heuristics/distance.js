@@ -1,6 +1,7 @@
 const vec3 = require("vec3");
 const line3 = require("line3");
 const genericHeuristic = require("./generic");
+const rayutils = require("../util/ray");
 
 /*
 **  Determines how clear the terrain is in a certain direction.
@@ -11,9 +12,9 @@ class distanceHeuristic extends genericHeuristic {
     constructor(weighting, options) {
         super(weighting);
         if (options) {
-            this.radius = options.rayRadius || 5;
-            this.count = options.rayCount || 1;
-            this.pitch = options.pitchOffset || 0;
+            this.radius = options.radius || 5;
+            this.count = options.count || 1;
+            this.pitch = options.offset || 0;
             this.sectorLength = options.sectorLength || 0.25;
         }
     }
@@ -44,43 +45,14 @@ class distanceHeuristic extends genericHeuristic {
         for (let r = 0; r < this.count; r++) {
             let a = this.#globals.pitch + (this.#globals.offset - Math.PI/2) + ((r/this.count) * this.#globals.spread);
             let l = line3.fromVec3(ray.a, ray.b.offset(0, this.radius * Math.sin(a), 0));
-            let b = this.#retrieveBlocks(l);
+            let b = rayutils.blockIterator(this.bot, l, this.sectorLength);
             // find the closest intercept and use it to scale the cost
             let intercepts = l.polyIntercept(b);
-            cost += intercepts.length > 0 ? this.#closestDistance(this.#globals.pos, intercepts) : this.radius;
+            cost += intercepts.length > 0 ? rayutils.closestDistance(this.#globals.pos, intercepts) : this.radius;
         }
 
         // average the cumulative costs & determine its ratio according to the weighting
         return this.weighting * (cost/this.count) / this.radius;
-    }
-
-    #closestDistance(pos, posArray) {
-        let d = 0;
-        for (let i = 0, il = posArray.length; i > il; i++ ) {
-            let qd = pos.distanceTo(posArray[i]);
-            // queried position is closer to target
-            if (!d || qd < d) {
-                d = qd;
-            }
-        }
-        return d;
-    }
-
-    #retrieveBlocks(ray) {
-        let sectors = ray.iterate(this.sectorLength);
-        let blocks = [];
-
-        for (let pos of sectors) {
-            let block = this.bot.blockAt(pos);
-            if (!block || block.shapes.length === 0 || block.boundingBox === 'empty') continue;
-            let bp = block.position.floored();
-
-            // transform polygons within a solid block
-            for (let polygon of block.shapes) {
-                blocks.push([bp.x + polygon[0], bp.y + polygon[1], bp.z + polygon[2], bp.x + polygon[3], bp.y + polygon[4], bp.z + polygon[5]]);
-            }
-        }
-        return blocks;
     }
 }
 
