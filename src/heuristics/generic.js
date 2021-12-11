@@ -5,10 +5,11 @@ const assert = require("assert");
 */
 
 class genericHeuristic {
+    #globals = {};
     bot = null;
 
-    constructor(weighting) {
-        this.weighting = weighting || 1;
+    constructor(options) {
+        this.options = options || {};
     }
 
     setClient(bot) {

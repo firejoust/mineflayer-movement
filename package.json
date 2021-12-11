@@ -24,7 +24,7 @@
   },
   "homepage": "https://github.com/firejoust/mineflayer-movement#readme",
   "dependencies": {
-    "line3": "^0.0.2",
+    "line3": "^0.0.5",
     "vec3": "^0.1.7"
   }
 }

@@ -8,21 +8,16 @@ const rayutils = require("../util/ray");
 */
 
 class distanceHeuristic extends genericHeuristic {
-    #globals = null;
-    constructor(weighting, options) {
-        super(weighting);
-        if (options) {
-            this.radius = options.radius || 5;
-            this.count = options.count || 1;
-            this.pitch = options.offset || 0;
-            this.sectorLength = options.sectorLength || 0.25;
-        }
+    constructor(options) {
+        let config = options || {};
+        this.weighting = config.weighting || 1;
+        this.radius = config.radius || 5;
+        this.count = config.count || 1;
+        this.pitch = config.offset || 0;
+        this.sectorLength = config.sectorLength || 0.25;
     }
 
     init() {
-        // initialise global variables for cost function
-        this.#globals = {};
-
         // determine an angle to start casting rays from (centered)
         this.#globals.spread = (Math.PI/2) * (1 - this.count ** -1);
         this.#globals.offset = (Math.PI - this.#globals.spread)/2;

@@ -12,10 +12,15 @@ class plugin {
         this.#heuristics.push(heuristic);
     }
 
-    steerAngle(destination, options) {
-        let rotations = options.rotations || 8; // by default, calculate heuristics for 8 rotational angles
-        let method = options.evaluation || 'cheapest'; // can also be 'average'
+    loadHeuristics(...heuristics) {
+        for (let h of heuristics) {
+            this.loadHeuristic(h);
+        }
+    }
 
+    costAngles(destination, rotations) {
+        // rotations must be a positive, real number
+        assert.ok(rotations && rotations.length > 0 && rotations % 1 === 0, "Invalid or no rotations specified. Must be a real number.");
         // initialise global heuristic values
         assert.ok(this.#heuristics.length > 0, "No heuristic functions are currently loaded. Use bot.movement.loadHeuristic to register a function.");
         for (let h of this.#heuristics) h.init();
@@ -38,9 +43,23 @@ class plugin {
             costs.push(c);
         }
 
+        return {
+            angles,
+            costs
+        }
+    }
+
+    steerAngle(destination, rotations, evaluation) {
+        let { angles, costs } = this.costAngles(destination, rotations);
+
         // find the optimal angle from costs
         assert.ok(evaluation[method], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
         return evaluation[method](costs, angles);
+    }
+
+    async steer(destination, rotations, evaluation) {
+        let angle = this.steerAngle(destination, rotations, evaluation);
+        return this.bot.look(angle, this.bot.entity.pitch);
     }
 }
 
