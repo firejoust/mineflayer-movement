@@ -9,16 +9,16 @@ const rayutils = require("../util/ray");
 
 class dangerHeuristic extends genericHeuristic {
     constructor(options) {
-        let config = options || {};
-        this.weighting = config.weighting || 1;
-        this.radius = config.radius || 4;
-        this.depth = config.depth || 4;
-        this.seperation = config.seperation || 1;
-        this.sectorLength = config.sectorLength || 0.25;
+        super(options);
+        this.weighting = this.options.weighting || 1;
+        this.radius = this.options.radius || 4;
+        this.depth = this.options.depth || 4;
+        this.seperation = this.options.seperation || 1;
+        this.sectorLength = this.options.sectorLength || 0.25;
     }
 
     init() {
-        this.#globals.pos = this.bot.entity.position;
+        this.globals.pos = this.bot.entity.position;
     }
 
     determineCost(yaw) {
@@ -27,10 +27,10 @@ class dangerHeuristic extends genericHeuristic {
 
         // cast a ray directly forward to make sure the depth isn't measured inside obstacles
         let radii = new vec3(-Math.sin(yaw), 0, -Math.cos(yaw));
-        let dest = this.#globals.pos.plus(radii.scaled(this.radius));
-        let ray = line3.fromVec3(this.#globals.pos, dest);
+        let dest = this.globals.pos.plus(radii.scaled(this.radius));
+        let ray = line3.fromVec3(this.globals.pos, dest);
         let blocks = rayutils.blockIterator(this.bot, ray, this.sectorLength);
-        let intercept = rayutils.closestIntercept(this.#globals.pos, ray.polyIntercept(blocks));
+        let intercept = rayutils.closestIntercept(this.globals.pos, ray.polyIntercept(blocks));
 
         // shorten the ray accordingly so new rays can be cast directly downwards without obstruction
         ray.b = intercept ?? ray.b;

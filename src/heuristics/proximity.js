@@ -6,8 +6,8 @@ const genericHeuristic = require("./generic");
 
 class proximityHeuristic extends genericHeuristic {
     constructor(options) {
-        let config = options || {};
-        this.weighting = config.weighting || 1;
+        super(options);
+        this.weighting = this.options.weighting || 1;
     }
 
     determineCost(yaw, destination) {

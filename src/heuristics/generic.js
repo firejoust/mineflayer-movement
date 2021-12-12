@@ -5,7 +5,7 @@ const assert = require("assert");
 */
 
 class genericHeuristic {
-    #globals = {};
+    globals = {};
     bot = null;
 
     constructor(options) {

@@ -1,5 +1,5 @@
 const assert = require(`assert`);
-const evaluation = require(`./src/util/evaluation`);
+const evalutils = require(`./src/util/evaluation`);
 
 class plugin {
     #heuristics = [];
@@ -20,7 +20,7 @@ class plugin {
 
     costAngles(destination, rotations) {
         // rotations must be a positive, real number
-        assert.ok(rotations && rotations.length > 0 && rotations % 1 === 0, "Invalid or no rotations specified. Must be a real number.");
+        assert.ok(rotations && rotations % 1 === 0, "Invalid or no rotations specified. Must be a real number.");
         // initialise global heuristic values
         assert.ok(this.#heuristics.length > 0, "No heuristic functions are currently loaded. Use bot.movement.loadHeuristic to register a function.");
         for (let h of this.#heuristics) h.init();
@@ -53,8 +53,8 @@ class plugin {
         let { angles, costs } = this.costAngles(destination, rotations);
 
         // find the optimal angle from costs
-        assert.ok(evaluation[method], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
-        return evaluation[method](costs, angles);
+        assert.ok(evalutils[evaluation], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
+        return evalutils[evaluation](costs, angles);
     }
 
     async steer(destination, rotations, evaluation) {
