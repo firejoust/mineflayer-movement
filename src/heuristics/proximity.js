@@ -2,6 +2,10 @@ const genericHeuristic = require("./generic");
 
 /*
 **  Determines the angular ratio from a direction to the destination
+**
+**  Examples:
+**  - Looking directly towards target (0° angular difference) = 1.
+**  - looking away from target (180° angular difference) = 0.
 */
 
 class proximityHeuristic extends genericHeuristic {

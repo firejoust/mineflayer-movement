@@ -5,6 +5,16 @@ const rayutils = require("../util/ray");
 
 /*
 **  Determines how clear the terrain is in a certain direction.
+**
+**  KEY:
+**  - "A" represents the location of the player's head
+**  - "[ ]" represents a block
+**  - "-" represents the raycast
+**  - "x" represents an intercept with a block
+**
+**  [A]---------[x]
+**  [ ]         [ ]
+**  [ ][ ][ ][ ][ ]
 */
 
 class distanceHeuristic extends genericHeuristic {

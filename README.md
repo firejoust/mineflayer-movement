@@ -1,6 +1,5 @@
 <div align="center">
   <h1>mineflayer-movement</h1>
-  <img src="">
   <i>Raycast based steering & obstacle avoidance implementation for mineflayer</i>
   <br>
   <h2>Disclaimer</h1>
