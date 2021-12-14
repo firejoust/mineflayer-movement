@@ -42,8 +42,11 @@ options = {
 **  Loading heuristics
 */
 
+// NOTE: this only needs to be done ONCE. If heuristics need to be reset, then the plugin must be loaded again with bot.loadPlugin.
 bot.movement.loadHeuristic(heuristic)
 bot.movement.loadHeuristics(heuristics...)
+
+// P.S. Heuristic options can be changed from its instance, E.g. disabling a heuristic: heuristic.weighting = 0
 ```
 ### Movement
 - "Movement" is technically done by the developer, however this plugin helps steer towards the safest direction.
