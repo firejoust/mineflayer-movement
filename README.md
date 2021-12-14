@@ -3,14 +3,24 @@
   <i>Raycast based steering & obstacle avoidance implementation for mineflayer</i>
   <br>
   <h2>Disclaimer</h1>
-  <b>This plugin is not currently in a useable state, nor is there a definite list of things that need to be done.</b>
+  <b>This plugin is not currently in a productive state, nor is there a definite list of things that need to be done.</b>
 </div>
+
+## Features
+### Overview
+- Smooth & dynamic player movement towards a destination
+- Obstacle avoidance through raycast assisted application of directional heuristics
+- Responsiveness & adaptation to rapidly changing environmental conditions 
+### Usage Case
+- Please note that this is NOT a pathfinding algorithm; It is unreliable over long distances and will not effectively get you from [point A to B](https://github.com/PrismarineJS/mineflayer-pathfinder)
+- The goal of this project is to account for cases where pathfinding doesn't work as well or may be overkill, for example PvP, following a player, etc
+- Unlike pathfinding, evaluation is done instantaneously to "steer" you in a general direction towards the destination
 
 ## API
 ### Heuristics
 - Heuristics calculate a cost for every direction, determining the most efficient direction of travel.
 - Each direction will have a total cost defined by the supplement of all the heuristics that are used.
-- Unlike A* implementations, a higher cost will actually correlate to a safer and more preferrable direction in this case.
+- A higher total cost will correlate to a safer and more preferrable direction, which is then evaluated to determine the final angle.
 ```js
 /*
 **  Heuristic classes
@@ -67,7 +77,7 @@ bot.movement.steerAngle(destination, rotations, evaluation)
 // retrieves a record of angles to costs after being calculated by directional heuristrics.
 bot.movement.costAngles(destination, rotations)
 
-destination = vec3 // A position which the player must move towards. (https://github.com/PrismarineJS/node-vec3)
+destination = vec3 // A position where the player must move towards. (https://github.com/PrismarineJS/node-vec3)
 rotations = number // (Default: 8) How many directions heuristics should be applied in, circularly. Higher values gather more information regarding the surrounding environment (Typically should be an exponent of two!)
 evaluation = string // (Default: "cheapest") Which evaluation method to use whilst determining the final angle. Valid options are "cheapest" & "average".
 
