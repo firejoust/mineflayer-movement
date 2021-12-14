@@ -22,7 +22,7 @@ class distanceHeuristic extends genericHeuristic {
         super(options);
         this.weighting = this.options.weighting || 1;
         this.radius = this.options.radius || 5;
-        this.count = this.options.count || 1;
+        this.count = this.options.count || 3;
         this.pitch = this.options.offset || 0;
         this.sectorLength = this.options.sectorLength || 0.25;
     }
