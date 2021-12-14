@@ -25,7 +25,7 @@ class dangerHeuristic extends genericHeuristic {
         super(options);
         this.weighting = this.options.weighting || 1;
         this.radius = this.options.radius || 1;
-        this.depth = this.options.depth || 4;
+        this.depth = this.options.depth || 3;
         this.seperation = this.options.seperation || 0.25;
         this.sectorLength = this.options.sectorLength || 0.5;
     }

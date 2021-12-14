@@ -47,7 +47,7 @@ options = {
   sectorLength: number, // (Dir: 0.25, Dan: 0.5) The distance between block intercept checks on a ray. Smaller values increase reliability in finding intercepts, however result in slower performance.
   count: number, // (distance heuristic only) (Default: 5)  how many rays are cast vertically in a single direction. Higher values increase reliability in determining obstacles. The total collective spread between rays is 90°.
   pitch: number, // (distance heuristic only) (Default: 0) The pitch offset (in radians) of the angle in which the middle ray is cast from. Influences overall where obstacles are detected, however should remain 0 in most cases.
-  depth: number, // (danger heuristic only) (Default: 4) How deep in blocks that depth rays should be cast. Higher values dull the urgency to avoid shallow holes.
+  depth: number, // (danger heuristic only) (Default: 3) How deep in blocks that depth rays should be cast. Higher values dull the urgency to avoid shallow holes.
   seperation: number, // (danger heuristic only) (Default: 0.25) The distance between depth rays casted from the primary ray (if confused, see src/heuristics/danger.js). Smaller values increase reliability in determining an average depth, however result in slower performance.
 }
 
@@ -83,5 +83,7 @@ bot.movement.costAngles(destination, rotations)
 destination = vec3 // A position where the player must move towards. (https://github.com/PrismarineJS/node-vec3)
 rotations = number // (Default: 8) How many directions heuristics should be applied in, circularly. Higher values gather more information regarding the surrounding environment (Typically should be an exponent of two!)
 evaluation = string // (Default: "cheapest") Which evaluation method to use whilst determining the final angle. Valid options are "cheapest" & "average".
-
 ```
+
+## Examples
+- See [simple.js](examples/simple.js) for an example of how a bot can follow the closest player.

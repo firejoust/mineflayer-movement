@@ -20,8 +20,8 @@ let conformity = new movement.heuristics.conformity({
 });
 let distance = new movement.heuristics.distance({
     weighting: 1,
-    radius: 5,
-    count: 3,
+    radius: 3,
+    count: 5,
     sectorLength: 1
 });
 let danger = new movement.heuristics.danger({
@@ -37,7 +37,7 @@ let danger = new movement.heuristics.danger({
 */
 
 bot.once("login", () => {
-    bot.movement.loadHeuristics(proximity, distance, danger);
+    bot.movement.loadHeuristics(proximity, conformity, distance, danger);
 });
 
 bot.on("message", json => {
