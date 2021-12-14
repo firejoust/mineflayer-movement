@@ -13,7 +13,10 @@ let evaluation = "cheapest"; // can also be "average" for smoother movement
 */
 
 let proximity = new movement.heuristics.proximity({
-    weighting: 1
+    weighting: 0.65
+});
+let conformity = new movement.heuristics.conformity({
+    weighting: 0.2
 });
 let distance = new movement.heuristics.distance({
     weighting: 1,

@@ -74,5 +74,6 @@ module.exports = {
         danger: require(`./src/heuristics/danger`),
         distance: require(`./src/heuristics/distance`),
         proximity: require(`./src/heuristics/proximity`),
+        conformity: require(`./src/heuristics/conformity`),
     }
 }
