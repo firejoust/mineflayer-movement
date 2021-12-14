@@ -1,9 +1,10 @@
 <div align="center">
   <h1>mineflayer-movement</h1>
-  <i>Raycast based steering & obstacle avoidance implementation for mineflayer</i>
-  <br>
-  <h2>Disclaimer</h1>
-  <b>This plugin is not currently in a productive state, nor is there a definite list of things that need to be done.</b>
+  <img src="https://img.shields.io/npm/v/mineflayer-movement?style=flat-square">
+  <img src="https://img.shields.io/github/license/firejoust/mineflayer-movement?style=flat-square">
+  <img src="https://img.shields.io/github/issues/firejoust/mineflayer-movement?style=flat-square">
+  <img src="https://img.shields.io/github/issues-pr/firejoust/mineflayer-movement?style=flat-square">
+  <p><i>Raycast based steering & obstacle avoidance implementation for mineflayer</i></p>
 </div>
 
 ## Features
