@@ -33,7 +33,7 @@ bot.movement.heuristics.generic(options) /* valid properties: weighting */
 // Determines a cost based on the difference between where the bot's facing vs. where it needs to face. Generally, smaller differences scale to a higher and therefore preferrable cost.
 bot.movement.heuristic.proximity(options) /* valid properties: weighting */
 
-// Prevents the player straying from the direction its currently heading by determining a difference between the angle it's facing vs. where it will face.
+// Prevents the player straying from the direction its currently heading by determining a difference between the angle it's facing vs. the direction of the heuristic.
 bot.movement.heuristic.conformity(options) /* valid properties: weighting */
 
 // Evaluates the average distance from obstacles and determines a cost. A closer proximity will result in a lower cost (i.e. less preferrable)
