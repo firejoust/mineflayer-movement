@@ -1,8 +1,3 @@
-const vec3 = require("vec3");
-const line3 = require("line3");
-const genericHeuristic = require("./generic");
-const rayutils = require("../util/ray");
-
 /*
 **  Determines how dangerous the terrain is in a certain direction.
 **
@@ -20,50 +15,100 @@ const rayutils = require("../util/ray");
 **  [ ][x][x][x][ ][ ][ ]
 */
 
-class dangerHeuristic extends genericHeuristic {
-    constructor(options) {
-        super(options);
-        this.weighting = this.options.weighting || 1;
-        this.radius = this.options.radius || 1;
-        this.depth = this.options.depth || 3;
-        this.seperation = this.options.seperation || 0.25;
-        this.sectorLength = this.options.sectorLength || 0.5;
+const Vec3 = require("vec3")
+const Line3 = require("line3")
+const Heuristic = require("./heuristic")
+const Iterator = require("../utils/iterator")
+
+class DangerHeuristic extends Heuristic {
+    constructor(weight, radius, depth, spread) {
+        super(weight, radius, depth, spread)
+        this.weight = weight
+        this.radius = radius
+        this.depth = depth
+        this.spread = spread
     }
 
     init() {
-        this.globals.pos = this.bot.entity.position;
+        this.position = this.client.entity.position
     }
 
-    determineCost(yaw) {
-        let castCount = 0;
-        let cost = 0;
+    cost(yaw) {
+        let cost, total
+        cost = 0
+        total = 0
 
         // cast a ray directly forward to make sure the depth isn't measured inside walls
-        let radii = new vec3(-Math.sin(yaw), 0, -Math.cos(yaw));
-        let dest = this.globals.pos.plus(radii.scaled(this.radius));
-        let ray = line3.fromVec3(this.globals.pos, dest);
+        let destination = new Vec3(
+            this.position.x - (Math.sin(yaw) * this.radius),
+            this.position.y,
+            this.position.z - (Math.cos(yaw) * this.radius)
+        )
 
-        // determine if the primary ray being cast forwards intercepts with anything
-        let blocks = rayutils.blockIterator(this.bot, ray, this.sectorLength);
-        let intercept = rayutils.closestIntercept(this.globals.pos, ray.polyIntercept(blocks));
+        let ray = Line3.fromVec3(this.position, destination)
 
-        // shorten the ray accordingly so rays aren't cast through walls
-        ray.b = intercept ?? ray.b;
-        
-        // cast rays directly downward to determine an average depth
-        for (let pos of ray.iterate(this.seperation)) {
-            // "depthcast" rays branch from the primary ray 
-            let dc = line3.fromVec3(pos, pos.offset(0, -this.depth, 0));
-            let b = rayutils.blockIterator(this.bot, dc, this.sectorLength);
-            // determine a depth at pos and add it to the cost
-            let intercepts = dc.polyIntercept(b);
-            cost += this.depth - (intercepts.length > 0 ? rayutils.closestDistance(pos, intercepts) : this.depth);
-            castCount++;
+        let intercept
+
+        Iterator.iterBlocks(ray, (x, y, z) => {
+            let pos = new Vec3(x, y, z)
+            let block = this.client.blockAt(pos)
+
+            if (block && block.boundingBox === "block") {
+                let rect = [
+                    [x, y, z],
+                    [x + 1, y + 1, z + 1]
+                ]
+
+                let entrance = ray.rectIntercept(rect, ray.rectFace(false))
+                let exit     = ray.rectIntercept(rect, ray.rectFace(true))
+
+                // use at least one
+                intercept = entrance ?? exit
+                return Boolean(intercept)
+            }
+        })
+
+        // use intercept to determine where the depth checks stop
+        ray = Line3.fromVec3(this.position, intercept ?? ray.b)
+       
+        // find multiple points sitting on the ray
+        for (let a of ray.iterate(this.spread)) {
+
+            // determine the maximum depth of the ray
+            let b = a.offset(0, -this.depth, 0)
+
+            // cast ray downwards to get the real depth
+            ray = Line3.fromVec3(a, b)
+
+            // reset the intercept
+            intercept = null
+
+            Iterator.iterBlocks(ray, (x, y, z) => {
+                let pos = new Vec3(x, y, z)
+                let block = this.client.blockAt(pos)
+    
+                if (block && block.boundingBox === "block") {
+                    let rect = [
+                        [x, y, z],
+                        [x + 1, y + 1, z + 1]
+                    ]
+    
+                    let entrance = ray.rectIntercept(rect, ray.rectFace(false))
+                    let exit     = ray.rectIntercept(rect, ray.rectFace(true))
+    
+                    // use at least one
+                    intercept = entrance ?? exit
+                    return Boolean(intercept)
+                }
+            })
+
+            total += 1
+            cost  += this.depth - (intercept ? a.distanceTo(intercept) : this.depth)
         }
 
-        // a ratio of the average depth
-        return (this.weighting * cost) / (this.depth * castCount || 1);
+        // the average depth
+        return this.weight * (cost / (this.depth * total || 1))
     }
 }
 
-module.exports = dangerHeuristic;
+module.exports = DangerHeuristic

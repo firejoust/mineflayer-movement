@@ -1,46 +1,34 @@
-const assert = require(`assert`);
-const evalutils = require(`./src/util/evaluation`);
+const Evaluation = require("./src/utils/evaluation")
 
-class plugin {
-    #heuristics = [];
-    constructor(bot) {
-        this.bot = bot;
+class Movement {
+    constructor(client, heuristics) {
+        this.client = client
+        this.heuristics = heuristics
+        this.heuristics.forEach(_ => _.setClient(this.client))
     }
 
-    loadHeuristic(heuristic) {
-        heuristic.setClient(this.bot);
-        this.#heuristics.push(heuristic);
-    }
+    getCosts(position, rotations) {
+        let angles, costs
 
-    loadHeuristics(...heuristics) {
-        for (let h of heuristics) {
-            this.loadHeuristic(h);
-        }
-    }
+        // allocate enough room
+        angles = new Float64Array(rotations)
+        costs = new Float64Array(rotations)
 
-    costAngles(destination, rotations) {
-        // rotations must be a positive, real number
-        assert.ok(rotations && rotations % 1 === 0, "Invalid or no rotations specified. Must be a real number.");
-        // initialise global heuristic values
-        assert.ok(this.#heuristics.length > 0, "No heuristic functions are currently loaded. Use bot.movement.loadHeuristic to register a function.");
-        for (let h of this.#heuristics) h.init();
-
-        let angles = [];
-        let costs = [];
+        // initialise heuristic constants
+        this.heuristics.forEach(_ => _.init())
 
         // calculate the cost of each yaw rotation
-        assert.ok(rotations > 0, "Rotations must be higher than zero.");
-        for (let r = 0, yaw = this.bot.entity.yaw; r < rotations; r++) {
-            let a = yaw + (r/rotations) * 2 * Math.PI;
-            let c = 0; // total cost
+        for (let r = 0; r < rotations; r++) {
+            let a = this.client.entity.yaw + (2 * Math.PI * r) / rotations
+            let c = 0
 
             // find the total cost by applying heuristics
-            for (let h of this.#heuristics) {
-                c += h.determineCost(a, destination);
+            for (let h of this.heuristics) {
+                c += h.cost(a, position)
             }
 
-            angles.push(a);
-            costs.push(c);
+            angles[r] = a
+            costs[r]  = c
         }
 
         return {
@@ -49,31 +37,27 @@ class plugin {
         }
     }
 
-    steerAngle(destination, rotations, evaluation) {
-        let { angles, costs } = this.costAngles(destination, rotations);
-
-        // find the optimal angle from costs
-        assert.ok(evalutils[evaluation], "Invalid evaluation method specified. Must be either \"cheapest\" or \"average\".");
-        return evalutils[evaluation](costs, angles);
+    getYaw(position, rotations, average) {
+        let { angles, costs } = this.getCosts(position, rotations)
+        let index = Number(Boolean(average))
+        return Evaluation[index](costs, angles)
     }
 
-    async steer(destination, rotations, evaluation) {
-        let angle = this.steerAngle(destination, rotations, evaluation);
-        return this.bot.look(angle, this.bot.entity.pitch);
+    steer(position, rotations, evaluation) {
+        return this.client.look(
+            this.getYaw(position, rotations, evaluation),
+            this.client.entity.pitch
+        )
     }
 }
 
-function inject(bot) {
-    bot.movement = new plugin(bot);
+function getPlugin(...heuristics) {
+    return function inject(client) {
+        client.movement = new Movement(client, heuristics)
+    }
 }
 
 module.exports = {
-    plugin: inject,
-    heuristics: {
-        generic: require(`./src/heuristics/generic`),
-        danger: require(`./src/heuristics/danger`),
-        distance: require(`./src/heuristics/distance`),
-        proximity: require(`./src/heuristics/proximity`),
-        conformity: require(`./src/heuristics/conformity`),
-    }
+    heuristics: require("./src/heuristics"),
+    getPlugin
 }

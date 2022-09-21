@@ -4,87 +4,84 @@
   <img src="https://img.shields.io/github/license/firejoust/mineflayer-movement?style=flat-square">
   <img src="https://img.shields.io/github/issues/firejoust/mineflayer-movement?style=flat-square">
   <img src="https://img.shields.io/github/issues-pr/firejoust/mineflayer-movement?style=flat-square">
-  <p><i>Raycast based steering & obstacle avoidance implementation for mineflayer</i></p>
 </div>
 
-## Features
-### Overview
-- Smooth & dynamic player movement towards a destination
+### Features
+#### Overview
+- Smooth & realistic player movement towards a destination
 - Obstacle avoidance through raycast assisted application of directional heuristics
-- Responsiveness & adaptation to rapidly changing environmental conditions 
-### Usage Case
+- Real time adaptation & responsiveness to changing environmental conditions 
+#### Usage Case
+- The goal of this project is to account for cases where pathfinding doesn't work well or may be overkill, for example PvP, following a player, etc
+- Evaluation is done instantaneously to "steer" you in a general direction towards the destination
 - Please note that this is NOT a pathfinding algorithm; It is unreliable over long distances and will not effectively get you from [point A to B](https://github.com/PrismarineJS/mineflayer-pathfinder)
-- The goal of this project is to account for cases where pathfinding doesn't work as well or may be overkill, for example PvP, following a player, etc
-- Unlike pathfinding, evaluation is done instantaneously to "steer" you in a general direction towards the destination
 
-## API
-### Heuristics
-- Heuristics calculate a cost for every direction, determining the most efficient direction of travel.
-- Each direction will have a total cost defined by the supplement of all the heuristics that are used.
-- A higher total cost will correlate to a safer and more preferrable direction, which is then evaluated to determine the final angle.
+### API
+#### Loading the Plugin
 ```js
-/*
-**  Heuristic classes
-*/
+const mineflayer = require("mineflayer")
+const movement = require("mineflayer-movement")
 
-// The base class for a heuristic, being mutually inclusive with all other heuristics. Only required for creating new heuristics by extending itself.
-bot.movement.heuristics.generic(options) /* valid properties: weighting */
+const {
+  ProximityHeuristic,
+  ConformityHeuristic,
+  DistanceHeuristic,
+  DangerHeuristic
+} = movement.heuristics
 
-// Determines a cost based on the difference between where the bot's facing vs. where it needs to face. Generally, smaller differences scale to a higher and therefore preferrable cost.
-bot.movement.heuristic.proximity(options) /* valid properties: weighting */
+const plugin = movement.getPlugin(
+  new ProximityHeuristic(1),
+  new ConformityHeuristic(0.5),
+  new DistanceHeuristic(1, 5, 5),
+  new DangerHeuristic(1, 2, 5, 0.25)
+)
 
-// Prevents the player straying from the direction its currently heading by determining a difference between the angle it's facing vs. the direction of the heuristic.
-bot.movement.heuristic.conformity(options) /* valid properties: weighting */
+const bot = mineflayer.createBot()
+bot.loadPlugin(plugin)
+```
+#### Heuristics
+- Each heuristic will calculate a cost for a direction of travel
+- Directions with a high cost generally have suitable terrain (depending on the heuristic)
+- The directional costs will then be evaluated to determine the final angle
+```js
+// how close the rotation angle is to the destination
+class ProximityHeuristic(weight);
 
-// Evaluates the average distance from obstacles and determines a cost. A closer proximity will result in a lower cost (i.e. less preferrable)
-bot.movement.heuristic.distance(options) /* valid properties: weighting, radius, sectorLength, count, pitch */
+// how close the rotation angle is to where the player is actually facing
+class ConformityHeuristic(weight);
 
-// Assesses terrain depth in order to discover the safest direction to travel. Unsafe (deep) terrain will correlate to a low cost, and shallow terrain to a high cost
-bot.movement.heuristic.danger(options) /* valid properties: weighting, radius, sectorLength, depth, seperation */
+// the distance from block/wall collisions in a certain direction
+class DistanceHeuristic(weight, radius, count);
+
+// assesses terrain depth in order to find the safest direction of travel
+class DangerHeuristic(weight, radius, depth, spread);
 
 options = {
-  weighting: number, // (Prox: 0.65, Conf: 0.2, Dir: 1, Dan: 1) The multiplier for a heuristic's final cost. Higher values will have a more considerable impact over the final costs.
-  radius: number, // (Dir: 3, Dan: 1) How far horizontally rays should traverse. Higher values dull reaction speed, however result in smoother avoidance.
-  sectorLength: number, // (Dir: 0.25, Dan: 0.5) The distance between block intercept checks on a ray. Smaller values increase reliability in finding intercepts, however result in slower performance.
-  count: number, // (distance heuristic only) (Default: 5)  how many rays are cast vertically in a single direction. Higher values increase reliability in determining obstacles. The total collective spread between rays is 90°.
-  pitch: number, // (distance heuristic only) (Default: 0) The pitch offset (in radians) of the angle in which the middle ray is cast from. Influences overall where obstacles are detected, however should remain 0 in most cases.
-  depth: number, // (danger heuristic only) (Default: 3) How deep in blocks that depth rays should be cast. Higher values dull the urgency to avoid shallow holes.
-  seperation: number, // (danger heuristic only) (Default: 0.25) The distance between depth rays casted from the primary ray (if confused, see src/heuristics/danger.js). Smaller values increase reliability in determining an average depth, however result in slower performance.
+  weight: number, // a multiplier for the heuristic's final cost. higher values correspond to increased sensitivity for that heuristic
+  radius: number, // how far the rays will traverse. A high radius is better for predicting terrain changes, but dulls the sensitivity when getting close
+  count: number,  // the number of rays that are cast vertically. The collective spread between all rays is 90°. odd numbers are recommended
+  depth: number,  // the maximum depth for rays that are cast downwards
+  spread: number, // the distance between rays that are cast downwards. values < 1 are recommended
 }
-
-/*
-**  Loading heuristics
-*/
-
-// NOTE: this only needs to be done ONCE. If heuristics need to be reset, then the plugin must be loaded again with bot.loadPlugin.
-bot.movement.loadHeuristic(heuristic)
-bot.movement.loadHeuristics(heuristics...)
-
-// P.S. Heuristic options can be changed from its instance, E.g. disabling a heuristic: heuristic.weighting = 0
 ```
-### Movement
-- "Movement" is technically done by the developer, however this plugin helps steer towards the safest direction.
-- This is achievable by applying each heuristic in surrounding directions defined by the number of `rotations`.
-- After accounting for all costs retrieved by directional heuristics, `evaluation` will determine the safest direction.
-- The result is omnidirectional, continuous movement that does not rely upon a set path.
+#### Methods
 ```js
-/*
-**  Movement/steering functions
-*/
+// sets the player's yaw to the most suitable angle towards the destination
+async bot.movement.steer(destination, rotations, average)
 
-// rotates the player's yaw towards the safest angle required to reach the destination. Returns a promise.
-async bot.movement.steer(destination, rotations, evaluation)
+// returns the most suitable angle towards the destination
+bot.movement.getYaw(destination, rotations, average)
 
-// returns the safest yaw angle required to reach the destination.
-bot.movement.steerAngle(destination, rotations, evaluation)
+// returns an object including arrays for "costs" and "rotations" (angles)
+bot.movement.getCosts(destination, rotations)
 
-// retrieves a record of angles to costs after being calculated by directional heuristrics.
-bot.movement.costAngles(destination, rotations)
-
-destination = vec3 // A position where the player must move towards. (https://github.com/PrismarineJS/node-vec3)
-rotations = number // (Default: 8) How many directions heuristics should be applied in, circularly. Higher values gather more information regarding the surrounding environment (Typically should be an exponent of two!)
-evaluation = string // (Default: "cheapest") Which evaluation method to use whilst determining the final angle. Valid options are "cheapest" & "average".
+options = {
+  destination: Vec3, // the position to move towards
+  rotations: number, // how many directions surrounding the player are checked
+  average: boolean?   // whether to evaluate all directional costs instead of selecting one
+}
 ```
 
-## Examples
-- See [simple.js](examples/simple.js) for an example of how a bot can follow the closest player.
+### Examples
+- Behaviour is highly configurable and differs based on the terrain; You'll have to tweak the heuristics to get your desired movement.
+- See [simple.js](assets/simple.js) for an example how a bot can follow the closest player.
