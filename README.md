@@ -1,5 +1,5 @@
 <div align="center">
-  <h1>mineflayer-movement</h1>
+  <h1>Mineflayer Movement</h1>
   <img src="https://img.shields.io/npm/v/mineflayer-movement?style=flat-square">
   <img src="https://img.shields.io/github/license/firejoust/mineflayer-movement?style=flat-square">
   <img src="https://img.shields.io/github/issues/firejoust/mineflayer-movement?style=flat-square">
@@ -12,9 +12,9 @@
 - Obstacle avoidance through raycast assisted application of directional heuristics
 - Real time adaptation & responsiveness to changing environmental conditions 
 #### Usage Case
-- The goal of this project is to account for cases where pathfinding doesn't work well or may be overkill, for example PvP, following a player, etc
+- The goal of this project is to account for cases where pathfinding doesn't work as well (e.g. PvP, following a player)
 - Evaluation is done instantaneously to "steer" you in a general direction towards the destination
-- Please note that this is NOT a pathfinding algorithm; It is unreliable over long distances and will not effectively get you from [point A to B](https://github.com/PrismarineJS/mineflayer-pathfinder)
+- Please note that this plugin is unreliable over long distances and will not effectively get you from [point A to B](https://github.com/PrismarineJS/mineflayer-pathfinder)!
 
 ### API
 #### Loading the Plugin
@@ -83,5 +83,5 @@ options = {
 ```
 
 ### Examples
-- Behaviour is highly configurable and differs based on the terrain; You'll have to tweak the heuristics to get your desired movement.
-- See [simple.js](assets/simple.js) for an example how a bot can follow the closest player.
+- Behaviour is highly configurable and differs based on the terrain; You'll have to tweak the heuristics to get your desired movement
+- See [simple.js](assets/simple.js) for an example of how a bot can follow the closest player
