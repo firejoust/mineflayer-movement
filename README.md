@@ -40,9 +40,9 @@ const bot = mineflayer.createBot()
 bot.loadPlugin(plugin)
 ```
 #### Heuristics
-- Each heuristic will calculate a cost for a direction of travel
-- Directions with a high cost generally have suitable terrain (depending on the heuristic)
-- The directional costs will then be evaluated to determine the final angle
+- Each heuristic will calculate a cost for a direction of travel (as a percentage ratio)
+- Directions with a high ratio will generally have the most suitable terrain
+- The final yaw angle that the player faces will take these into consideration
 ```js
 // how close the rotation angle is to the destination
 class ProximityHeuristic(weight);
@@ -75,13 +75,13 @@ bot.movement.getYaw(destination, rotations, average)
 // returns an object including the yaw angle with its associated cost
 bot.movement.getRotation(destination, rotations, average)
 
-// returns an object including rotations and costs
+// returns an object including a yaw angle and cost for every rotation
 bot.movement.getRotations(destination, rotations)
 
 options = {
   destination: Vec3, // the position to move towards
   rotations: number, // how many directions surrounding the player are checked
-  average: boolean?   // whether to evaluate all directional costs instead of selecting one
+  average: boolean?   // whether to accumulate all directional costs instead of selecting one
 }
 ```
 
