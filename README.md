@@ -69,11 +69,14 @@ options = {
 // sets the player's yaw to the most suitable angle towards the destination
 async bot.movement.steer(destination, rotations, average)
 
-// returns the most suitable angle towards the destination
+// returns a yaw angle pointing towards the destination
 bot.movement.getYaw(destination, rotations, average)
 
-// returns an object including arrays for "costs" and "rotations" (angles)
-bot.movement.getCosts(destination, rotations)
+// returns an object including the yaw angle with its associated cost
+bot.movement.getRotation(destination, rotations, average)
+
+// returns an object including rotations and costs
+bot.movement.getRotations(destination, rotations)
 
 options = {
   destination: Vec3, // the position to move towards

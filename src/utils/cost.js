@@ -1,9 +1,9 @@
-function cheapest(costs, angles) {
+function cheapest(costs, _angles) {
     let index = 0
     for (let i = 1; i < costs.length; i++) {
         if (costs[i] > costs[index]) index = i
     }
-    return angles[index]
+    return costs[index]
 }
 
 function average(costs, angles) {
@@ -16,7 +16,7 @@ function average(costs, angles) {
         x += costs[i] * Math.sin(angles[i])
     }
 
-    return Math.atan2(x, z)
+    return Math.sqrt(x ** 2 + z ** 2)
 }
 
 module.exports = [

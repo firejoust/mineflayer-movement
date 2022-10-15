@@ -1,13 +1,21 @@
 const Evaluation = require("./src/utils/evaluation")
+const Cost = require("./src/utils/cost")
 
 class Movement {
+    #client
+    #heuristics
+    #totalWeight
+    
     constructor(client, heuristics) {
-        this.client = client
-        this.heuristics = heuristics
-        this.heuristics.forEach(_ => _.setClient(this.client))
+        this.#client = client
+        this.#heuristics = heuristics
+        this.#totalWeight = 0
+        // set the client for each heuristic
+        this.#heuristics.forEach(_ => _.setClient(this.#client))
+        this.#heuristics.forEach(_ => this.#totalWeight += _.weight)
     }
 
-    getCosts(position, rotations) {
+    getRotations(position, rotations) {
         let angles, costs
 
         // allocate enough room
@@ -15,20 +23,20 @@ class Movement {
         costs = new Float64Array(rotations)
 
         // initialise heuristic constants
-        this.heuristics.forEach(_ => _.init())
+        this.#heuristics.forEach(_ => _.init())
 
         // calculate the cost of each yaw rotation
         for (let r = 0; r < rotations; r++) {
-            let a = this.client.entity.yaw + (2 * Math.PI * r) / rotations
+            let a = this.#client.entity.yaw + (2 * Math.PI * r) / rotations
             let c = 0
 
             // find the total cost by applying heuristics
-            for (let h of this.heuristics) {
+            for (let h of this.#heuristics) {
                 c += h.cost(a, position)
             }
 
             angles[r] = a
-            costs[r]  = c
+            costs[r]  = c / this.#totalWeight // put cost within a 0-1 ratio
         }
 
         return {
@@ -37,16 +45,25 @@ class Movement {
         }
     }
 
+    getRotation(position, rotations, average) {
+        let { angles, costs } = this.getRotations(position, rotations)
+        let index = Number(Boolean(average))
+        return {
+            yaw: Evaluation[index](costs, angles),
+            cost: Cost[index](costs, angles)
+        }
+    }
+
     getYaw(position, rotations, average) {
-        let { angles, costs } = this.getCosts(position, rotations)
+        let { angles, costs } = this.getRotations(position, rotations)
         let index = Number(Boolean(average))
         return Evaluation[index](costs, angles)
     }
 
     steer(position, rotations, evaluation) {
-        return this.client.look(
+        return this.#client.look(
             this.getYaw(position, rotations, evaluation),
-            this.client.entity.pitch
+            this.#client.entity.pitch
         )
     }
 }
