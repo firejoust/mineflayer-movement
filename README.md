@@ -69,7 +69,7 @@ options = {
 // sets the player's yaw to the most suitable angle towards the destination
 async bot.movement.steer(destination, rotations, average)
 
-// sets the control states to move towards the destination
+// sets the player's yaw OR control states to move towards the destination
 async bot.movement.move(yaw, headless)
 
 // returns a yaw angle pointing towards the destination
