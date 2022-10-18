@@ -1,3 +1,6 @@
+const States = [ "back", "left", "forward", "right" ]
+
+const Angle = require("./src/utils/angle")
 const Evaluation = require("./src/utils/evaluation")
 const Cost = require("./src/utils/cost")
 
@@ -60,11 +63,43 @@ class Movement {
         return Evaluation[index](costs, angles)
     }
 
-    steer(position, rotations, evaluation) {
+    async steer(position, rotations, evaluation) {
         return this.#client.look(
             this.getYaw(position, rotations, evaluation),
             this.#client.entity.pitch
         )
+    }
+
+    async move(yaw, headless) {
+        if (headless) {
+            let index = 0
+            let radius = Math.PI * 2 / 3
+            let diff0 = Angle.difference(this.#client.entity.yaw, yaw)
+            let diff1 = Angle.inverse(diff0)
+            // create a radius for each cardinal direction
+            for (let i = -Math.PI; i < Math.PI; i += Math.PI/2) {
+                // original angle radius
+                let x0, x1
+                x0 = i - radius / 2
+                x1 = i + radius / 2
+                // enable control state if destination angle within radius
+                x0 <= diff0 && diff0 <= x1 ||
+                x1 <= diff1 && diff1 <= x0
+                ? this.#client.setControlState(States[index], true)
+                : this.#client.setControlState(States[index], false)
+                // next state
+                index++
+            }
+        } else {
+            this.#client.setControlState("forward", true)
+            return this.#client.look(yaw, this.#client.entity.pitch)
+        }
+    }
+
+    stop() {
+        for (let state of States) {
+            this.#client.setControlState(state, false)
+        }
     }
 }
 

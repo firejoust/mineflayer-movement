@@ -16,6 +16,7 @@ declare class Movement {
     getRotation(position: Vec3, rotations: number, average: boolean): Rotation
     getYaw(position: Vec3, rotations: number, average: boolean): number
     steer(position: Vec3, rotations: number, average: boolean): Promise<void>
+    move(yaw: number, headless: boolean): Promise<void>
 }
 
 declare class DangerHeuristic {
