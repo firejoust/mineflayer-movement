@@ -66,15 +66,14 @@ options = {
 ```
 #### Methods
 ```js
-
-// returns a yaw angle pointing towards the destination
-bot.movement.getYaw(destination, rotations, average)
-
 // sets the player's yaw to the most suitable angle towards the destination
 async bot.movement.steer(destination, rotations, average)
 
 // sets the control states to move towards the destination
 async bot.movement.move(yaw, headless)
+
+// returns a yaw angle pointing towards the destination
+bot.movement.getYaw(destination, rotations, average)
 
 // returns an object including the yaw angle with its associated cost
 bot.movement.getRotation(destination, rotations, average)
