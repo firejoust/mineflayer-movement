@@ -84,7 +84,7 @@ bot.movement.getRotations(destination, rotations)
 options = {
   destination: Vec3,  // the position to move towards
   rotations: number,  // how many directions surrounding the player are checked
-  average: boolean?,  // whether to accumulate all directional costs instead of selecting one
+  average: boolean?,  // whether to average all directional costs instead of selecting one
   headless: boolean?, // whether to use strafing instead of snapping to the yaw angle
   yaw: number,        // the yaw angle to move towards (in radians)
 }
