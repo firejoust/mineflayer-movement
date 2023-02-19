@@ -1,6 +1,6 @@
 {
   "name": "mineflayer-movement",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "A lighter solution to basic player movement through raycast-driven obstacle avoidance and steering",
   "main": "index.js",
   "scripts": {
