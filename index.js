@@ -83,8 +83,8 @@ class Movement {
                 x0 = i - radius / 2
                 x1 = i + radius / 2
                 // enable control state if destination angle within radius
-                x0 <= diff0 && diff0 <= x1 ||
-                x1 <= diff1 && diff1 <= x0
+                x0 <= diff0 && diff0 <= x1 || x1 <= diff0 && diff0 <= x0 ||
+                x1 <= diff1 && diff1 <= x0 || x0 <= diff1 && diff1 <= x1
                 ? this.#client.setControlState(States[index], true)
                 : this.#client.setControlState(States[index], false)
                 // next state
