@@ -91,7 +91,7 @@ class Movement {
                 index++
             }
         } else {
-            this.#client.setControlState("forward", true)
+            States.forEach(state => this.#client.setControlState(state, state === "forward"))
             return this.#client.look(yaw, this.#client.entity.pitch)
         }
     }
