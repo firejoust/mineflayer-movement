@@ -81,12 +81,16 @@ bot.movement.getRotation(destination, rotations, average)
 // returns an object including a yaw angle and cost for every rotation
 bot.movement.getRotations(destination, rotations)
 
+// resets the currently active heuristics
+bot.movement.setHeuristics(...heuristics)
+
 options = {
-  destination: Vec3,  // the position to move towards
-  rotations: number,  // how many directions surrounding the player are checked
-  average: boolean?,  // whether to average all directional costs instead of selecting one
-  headless: boolean?, // whether to use strafing instead of snapping to the yaw angle
-  yaw: number,        // the yaw angle to move towards (in radians)
+  destination: Vec3,    // the position to move towards
+  rotations: number,    // how many directions surrounding the player are checked
+  average: boolean?,    // whether to average all directional costs instead of selecting one
+  headless: boolean?,   // whether to use strafing instead of snapping to the yaw angle
+  yaw: number,          // the yaw angle to move towards (in radians)
+  heuristics: Heuristic // the new heuristics that will be applied
 }
 ```
 

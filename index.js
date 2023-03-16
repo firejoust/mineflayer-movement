@@ -6,14 +6,21 @@ const Cost = require("./src/utils/cost")
 
 class Movement {
     #client
-    #heuristics
     #totalWeight
+    #heuristics
     
     constructor(client, heuristics) {
         this.#client = client
-        this.#heuristics = heuristics
         this.#totalWeight = 0
+        this.#heuristics = heuristics
         // set the client for each heuristic
+        this.#heuristics.forEach(_ => _.setClient(this.#client))
+        this.#heuristics.forEach(_ => this.#totalWeight += _.weight)
+    }
+
+    setHeuristics(...heuristics) {
+        this.#totalWeight = 0
+        this.#heuristics = heuristics
         this.#heuristics.forEach(_ => _.setClient(this.#client))
         this.#heuristics.forEach(_ => this.#totalWeight += _.weight)
     }

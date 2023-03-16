@@ -12,6 +12,7 @@ declare interface Rotation {
 }
 
 declare class Movement {
+    setHeuristics(...heuristics: Heuristic[]): void
     getRotations(position: Vec3, rotations: number): Rotations
     getRotation(position: Vec3, rotations: number, average: boolean): Rotation
     getYaw(position: Vec3, rotations: number, average: boolean): number
