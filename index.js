@@ -1,122 +1,110 @@
-const States = [ "back", "left", "forward", "right" ]
+const Heuristics = require("./src/heuristics")
 
-const Angle = require("./src/utils/angle")
-const Evaluation = require("./src/utils/evaluation")
-const Cost = require("./src/utils/cost")
+module.exports.plugin = function inject(bot) {
+    bot.movement = new Plugin(bot)
+}
 
-class Movement {
-    #client
-    #totalWeight
-    #heuristics
-    
-    constructor(client, heuristics) {
-        this.#client = client
-        this.#totalWeight = 0
-        this.#heuristics = heuristics
-        // set the client for each heuristic
-        this.#heuristics.forEach(_ => _.setClient(this.#client))
-        this.#heuristics.forEach(_ => this.#totalWeight += _.weight)
+function Plugin(bot) {
+    this.heuristics  = Heuristics.inject(bot)
+
+    // public
+    this.setHeuristics = setHeuristics
+    this.setControls   = setControls
+    this.getYaw        = getYaw
+    this.steer         = steer
+
+    // currently active heuristics
+    let heuristics = new Array()
+
+    function setHeuristics(...args) {
+        this.heuristics = new Array(...args)
     }
 
-    setHeuristics(...heuristics) {
-        this.#totalWeight = 0
-        this.#heuristics = heuristics
-        this.#heuristics.forEach(_ => _.setClient(this.#client))
-        this.#heuristics.forEach(_ => this.#totalWeight += _.weight)
+    function setControls(yaw, angleRadius) {
+
     }
 
-    getRotations(position, rotations) {
-        let angles, costs
+    function getYaw(fov, rotations) {
+        const costs = new Float64Array(rotations)
 
-        // allocate enough room
-        angles = new Float64Array(rotations)
-        costs = new Float64Array(rotations)
+        // calculate the angular components
+        const total = fov * Math.PI / 180
+        const increment = total / rotations
+        const base = bot.entity.yaw - total / 2
 
-        // initialise heuristic constants
-        this.#heuristics.forEach(_ => _.init())
-
-        // calculate the cost of each yaw rotation
-        for (let r = 0; r < rotations; r++) {
-            let a = this.#client.entity.yaw + (2 * Math.PI * r) / rotations
-            let c = 0
-
-            // find the total cost by applying heuristics
-            for (let h of this.#heuristics) {
-                c += h.cost(a, position)
-            }
-
-            angles[r] = a
-            costs[r]  = c / this.#totalWeight // put cost within a 0-1 ratio
+        // add the total cost for each rotation
+        for (let i = 0; i < rotations; i++) {
+            heuristics.forEach(heuristic =>
+                costs[i] += heuristic.cost(base + increment * i)
+            )
         }
 
-        return {
-            angles,
-            costs
+        let cheapest = null
+
+        // find the rotation with the cheapest cost
+        for (let i = 0; i < rotations; i++) {
+            if (cheapest === null || costs[cheapest] > costs[i])
+                cheapest = i
         }
+
+        return base + increment * cheapest
     }
 
-    getRotation(position, rotations, average) {
-        let { angles, costs } = this.getRotations(position, rotations)
-        let index = Number(Boolean(average))
-        return {
-            yaw: Evaluation[index](costs, angles),
-            cost: Cost[index](costs, angles)
-        }
-    }
-
-    getYaw(position, rotations, average) {
-        let { angles, costs } = this.getRotations(position, rotations)
-        let index = Number(Boolean(average))
-        return Evaluation[index](costs, angles)
-    }
-
-    async steer(position, rotations, evaluation) {
-        return this.#client.look(
-            this.getYaw(position, rotations, evaluation),
-            this.#client.entity.pitch
-        )
-    }
-
-    async move(yaw, headless) {
-        if (headless) {
-            let index = 0
-            let radius = Math.PI * 2 / 3
-            let diff0 = Angle.difference(this.#client.entity.yaw, yaw)
-            let diff1 = Angle.inverse(diff0)
-            // create a radius for each cardinal direction
-            for (let i = -Math.PI; i < Math.PI; i += Math.PI/2) {
-                // original angle radius
-                let x0, x1
-                x0 = i - radius / 2
-                x1 = i + radius / 2
-                // enable control state if destination angle within radius
-                x0 <= diff0 && diff0 <= x1 || x1 <= diff0 && diff0 <= x0 ||
-                x1 <= diff1 && diff1 <= x0 || x0 <= diff1 && diff1 <= x1
-                ? this.#client.setControlState(States[index], true)
-                : this.#client.setControlState(States[index], false)
-                // next state
-                index++
-            }
-        } else {
-            States.forEach(state => this.#client.setControlState(state, state === "forward"))
-            return this.#client.look(yaw, this.#client.entity.pitch)
-        }
-    }
-
-    stop() {
-        for (let state of States) {
-            this.#client.setControlState(state, false)
-        }
+    function steer(yaw, forceLook) {
+        
     }
 }
 
-function getPlugin(...heuristics) {
-    return function inject(client) {
-        client.movement = new Movement(client, heuristics)
-    }
-}
 
-module.exports = {
-    heuristics: require("./src/heuristics"),
-    getPlugin
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+const bot = {}
+
+// FOV?
+
+bot.movement.setHeuristics(
+    new bot.movement.heuristics.Distance(1)
+        .radius(4)
+        .count(3)
+        .spread(20),
+    new bot.movement.heuristics.Danger(1)
+        .radius(2)
+        .depth(5)
+        .spread(0.25),
+    new bot.movement.heuristics.Proximity(2)
+        .target(position)
+        .avoid(true)
+)
+
+const yaw = bot.movement.getYaw(fov, rotations)
+bot.movement.setControls(yaw, angleRadius)
+bot.movement.steer(yaw, forceLook)
+*/
