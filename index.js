@@ -41,11 +41,11 @@ function Plugin(bot) {
             )
         }
 
-        let cheapest = null
+        let cheapest = -1
 
         // find the rotation with the cheapest cost
         for (let i = 0; i < rotations; i++) {
-            if (cheapest === null || costs[cheapest] > costs[i])
+            if (cheapest < 0 || costs[cheapest] > costs[i])
                 cheapest = i
         }
 
