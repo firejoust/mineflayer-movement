@@ -1,4 +1,5 @@
 const Heuristics = require("./src/heuristics")
+const Assert = require("assert")
 
 module.exports.plugin = function inject(bot) {
     bot.movement = new Plugin(bot)
@@ -17,7 +18,7 @@ function Plugin(bot) {
     let heuristics = new Array()
 
     function setHeuristics(...args) {
-        this.heuristics = new Array(...args)
+        heuristics = args
     }
 
     function setControls(yaw, angleRadius) {
@@ -25,12 +26,13 @@ function Plugin(bot) {
     }
 
     function getYaw(fov, rotations) {
+        Assert.ok(heuristics.length > 0, "No heuristics have been loaded!")
         const costs = new Float64Array(rotations)
 
         // calculate the angular components
         const total = fov * Math.PI / 180
         const increment = total / rotations
-        const base = bot.entity.yaw - total / 2
+        const base = bot.entity.yaw + increment / 2 - total / 2
 
         // add the total cost for each rotation
         for (let i = 0; i < rotations; i++) {
