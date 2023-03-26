@@ -19,32 +19,32 @@ module.exports = function Heuristics(bot) {
     }
 
     return new class Plugin {
-        #active = {}
+        active = {}
 
         register(type, label) {
             const _label = label || type
 
-            this.#active[_label] = null
+            this.active[_label] = null
 
             switch (type) {
                 case 'distance':
-                    this.#active[_label] = new Heuristics.Distance()
-                    return this.#active[_label]
+                    this.active[_label] = new Heuristics.Distance()
+                    return this.active[_label]
 
                 case 'danger':
-                    this.#active[_label] = new Heuristics.Danger()
-                    return this.#active[_label]
+                    this.active[_label] = new Heuristics.Danger()
+                    return this.active[_label]
 
                 case 'proximity':
-                    this.#active[_label] = new Heuristics.Proximity()
-                    return this.#active[_label]
+                    this.active[_label] = new Heuristics.Proximity()
+                    return this.active[_label]
                     
                 case 'conformity':
-                    this.#active[_label] = new Heuristics.Conformity()
-                    return this.#active[_label]
+                    this.active[_label] = new Heuristics.Conformity()
+                    return this.active[_label]
             }
 
-            if (this.#active[_label] === null) {
+            if (this.active[_label] === null) {
                 throw new TypeError("Invalid heuristic type specified!")
             }
 
@@ -52,10 +52,10 @@ module.exports = function Heuristics(bot) {
         }
 
         get(label) {
-            if (this.#active[label] === undefined) {
+            if (this.active[label] === undefined) {
                 throw new Error(`No active heuristics found with label '${label}'`)
             }
-            return this.#active[label]
+            return this.active[label]
         }
     }
 }
