@@ -41,19 +41,20 @@ function Plugin(bot) {
             )
         }
 
-        let cheapest = -1
+        let cheapest = null
 
         // find the rotation with the cheapest cost
         for (let i = 0; i < rotations; i++) {
-            if (cheapest < 0 || costs[cheapest] > costs[i])
+            if (cheapest === null || costs[i] < costs[cheapest]) {
                 cheapest = i
+            }
         }
 
         return base + increment * cheapest
     }
 
-    function steer(yaw, forceLook) {
-        
+    function steer(yaw, force) {
+        return bot.look(yaw, bot.entity.pitch, force)
     }
 }
 
