@@ -2,29 +2,23 @@ const Vec3 = require("vec3")
 
 module.exports.inject = function inject(bot, Set) {
     return class Danger {
-        #weight  = 1
-
+        #weight    = 1
         #radius    = 5
         #count     = 20
         #depth     = 3
         #descend   = false
         #increment = 0.2
 
+        weight    = Set(this, weight => this.#weight = weight)
         radius    = Set(this, radius => this.#radius = radius)
         depth     = Set(this, depth => this.#depth = depth)
         count     = Set(this, count => this.#count = count)
         descend   = Set(this, descend => this.#descend = descend)
         increment = Set(this, increment => this.#increment = increment)
 
-        constructor(weight) {
-            this.#weight = weight
-        }
-
         cost(yaw) {
             let cost = 0
             let radius = this.#radius
-
-            const { x, y, z } = bot.entity.position
 
             const x1 = -Math.sin(yaw)
             const z1 = -Math.cos(yaw)
@@ -34,15 +28,13 @@ module.exports.inject = function inject(bot, Set) {
 
                 // verify there's no wall before checking depth
                 for (let i = 0; i < total; i++) {
-                    const pos = new Vec3(
-                        x1 * this.#increment * i,
-                        0,
-                        z1 * this.#increment * i
-                    )
+                    const x2 = x1 * this.#increment * i
+                    const z2 = z1 * this.#increment * i
+                    const pos = bot.entity.position.offset(x2, 0, z2)
 
                     // initial ray has intercepted with a block
-                    if (bot.blockAt(pos.offset(x, y, z))?.boundingBox === 'block') {
-                        radius = Math.sqrt(pos.x ** 2 + pos.z ** 2)
+                    if (bot.blockAt(pos)?.boundingBox === 'block') {
+                        radius = Math.sqrt(z2 ** 2 + z2 ** 2)
                         break
                     }
                 }
@@ -75,14 +67,15 @@ module.exports.inject = function inject(bot, Set) {
                                 break
                             }
 
-                            const pos = new Vec3(
-                                vectors[i][0],
-                                this.#increment * -j,
-                                vectors[i][2]
-                            )
+                            // offset depth vector from original vector 
+                            const x2 = vectors[i][0]
+                            const y2 = this.#increment * -j
+                            const z2 = vectors[i][2]
+                            const pos = bot.entity.position.offset(x2, y2, z2)
 
-                            if (bot.blockAt(pos.offset(x, y, z))?.boundingBox === 'block') {
-                                cost += Math.abs(pos.y) / this.#depth
+                            // depth intercept with block
+                            if (bot.blockAt(pos)?.boundingBox === 'block') {
+                                cost += Math.abs(y2) / this.#depth
                                 break
                             }
                         }

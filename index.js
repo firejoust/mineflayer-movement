@@ -6,7 +6,7 @@ module.exports.plugin = function inject(bot) {
 }
 
 function Plugin(bot) {
-    this.heuristics  = Heuristics.inject(bot)
+    this.heuristic = new Heuristics(bot)
 
     // public
     this.setHeuristics = setHeuristics
