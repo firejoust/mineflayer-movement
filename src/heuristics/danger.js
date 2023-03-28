@@ -1,5 +1,3 @@
-const Vec3 = require("vec3")
-
 module.exports.inject = function inject(bot, Set) {
     return class Danger {
         #weight    = 1
@@ -20,69 +18,90 @@ module.exports.inject = function inject(bot, Set) {
             let cost = 0
             let radius = this.#radius
 
-            const x1 = -Math.sin(yaw)
-            const z1 = -Math.cos(yaw)
+            const x = -Math.sin(yaw)
+            const z = -Math.cos(yaw)
+
+            const box = new Float64Array(2)
+
+            if (Math.abs(x) > Math.abs(z)) {
+                box[0] = Math.sign(x)
+                box[1] = z * Math.abs(1 / x)
+            } else {
+                box[0] = x * Math.abs(1 / z)
+                box[1] = Math.sign(z)
+            }
+
+            box[0] *= 0.3
+            box[1] *= 0.3
             
             {
                 const total = this.#radius / this.#increment
 
                 // verify there's no wall before checking depth
                 for (let i = 0; i < total; i++) {
-                    const x2 = x1 * this.#increment * i
-                    const z2 = z1 * this.#increment * i
-                    const pos = bot.entity.position.offset(x2, 0, z2)
+                    const x1 = x * this.#increment * i
+                    const z1 = z * this.#increment * i
+
+                    // initial raycast offset
+                    const pos = bot.entity.position.offset(x1, 0, z1)
+                    pos.x += box[0]
+                    pos.z += box[1]
 
                     // initial ray has intercepted with a block
                     if (bot.blockAt(pos)?.boundingBox === 'block') {
-                        radius = Math.sqrt(z2 ** 2 + z2 ** 2)
+                        radius = Math.sqrt(z1 ** 2 + z1 ** 2)
                         break
                     }
                 }
             }
 
             {
-                // skip the first position
-                const count = Math.floor(this.#count * radius / this.#radius) - 1
+                const count = Math.floor(this.#count * radius / this.#radius)
+                const vectors = new Array(count)
+                const increment = radius / count
 
-                if (count > 0) {
-                    const vectors = new Array(count)
-                    const increment = radius / count
+                // initialise depth check rays
+                for (let i = 0; i < count; i++) {
+                    const x1 = x * increment * i
+                    const z1 = z * increment * i
+                    vectors[i] = [x1, -this.#depth, z1]
+                }
 
-                    // initialise depth check rays
-                    for (let i = 0; i < count; i++) {
-                        const x2 = x1 * increment * i
-                        const z2 = z1 * increment * i
-                        vectors[i] = [x2, -this.#depth, z2]
-                    }
+                // find the block depth intercept
+                for (let i = 0; i < count; i++) {
 
-                    // find the block depth intercept
-                    for (let i = 0; i < count; i++) {
+                    const length = this.#depth / this.#increment
 
-                        const length = this.#depth / this.#increment
+                    // skip the first position
+                    for (let j = 0; j <= length; j++) {
+                        // no intercept found
+                        if (j === length) {
+                            cost += 1
+                            break
+                        }
 
-                        // skip the first position
-                        for (let j = 1; j <= length; j++) {
-                            if (j === length) {
-                                cost += 1
-                                break
-                            }
+                        // offset depth vector from raycast vector
+                        const x1 = vectors[i][0]
+                        const z1 = vectors[i][2]
+                        const y = this.#increment * -j
 
-                            // offset depth vector from original vector 
-                            const x2 = vectors[i][0]
-                            const y2 = this.#increment * -j
-                            const z2 = vectors[i][2]
-                            const pos = bot.entity.position.offset(x2, y2, z2)
-
-                            // depth intercept with block
-                            if (bot.blockAt(pos)?.boundingBox === 'block') {
-                                cost += Math.abs(y2) / this.#depth
-                                break
-                            }
+                        // set boundingbox offset (half player width)
+                        const pos = bot.entity.position.offset(x1, y, z1)
+                        pos.x += box[0]
+                        pos.z += box[1]
+                        
+                        // depth intercept with block
+                        if (bot.blockAt(pos)?.boundingBox === 'block') {
+                            cost += Math.abs(y) / this.#depth
+                            break
                         }
                     }
-
-                    cost /= count
                 }
+
+                if (count > 0)
+                    cost /= count
+                else
+                    cost = 1
             }
 
             return this.#descend

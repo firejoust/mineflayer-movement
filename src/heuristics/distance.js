@@ -4,6 +4,15 @@ const PI_HALF = Math.PI / 2
 const PI_DOUBLE = Math.PI * 2
 const PI_RATIO = Math.PI / 180
 
+/*
+    IDEA: START THE RAYCAST FROM THE PLAYER'S BOUNDING BOX.
+    
+    use the same vectors, but the first position in that direction will be
+    on the player's bounding box.
+
+    if this is used, there may not be a need to use "width" anymore
+*/
+
 module.exports.inject = function inject(bot, Set) {
     return class Distance {
         #weight    = 1
@@ -22,8 +31,26 @@ module.exports.inject = function inject(bot, Set) {
 
         cost(yaw) {
             let cost = 0
-            const vectors1 = new Array(this.#count)
-            const vectors2 = new Array(this.#count) // width
+
+            const vectors1 = new Array(this.#count) // raycast direction
+            const vectors2 = new Array(this.#count) // raycast width
+
+            const x = -Math.sin(yaw)
+            const z = -Math.cos(yaw)
+
+            const box = new Float64Array(2) // boundingbox offset
+
+            // allocate boundingbox offset vector
+            if (Math.abs(x) > Math.abs(z)) {
+                box[0] = Math.sign(x)
+                box[1] = z * Math.abs(1 / x)
+            } else {
+                box[0] = x * Math.abs(1 / z)
+                box[1] = Math.sign(z)
+            }
+
+            box[0] *= 0.3
+            box[1] *= 0.3
 
             {
                 // angular components
@@ -32,29 +59,29 @@ module.exports.inject = function inject(bot, Set) {
 
                 // initialise relative vectors
                 for (let i = 0; i < this.#count; i++) {
+                    vectors1[i] = new Float64Array(3)
+                    vectors2[i] = new Float64Array(2)
+
                     const theta = increment * i
 
                     // get the horizontal/vertical 2D components
                     const h = Math.cos(theta)
                     const v = Math.sin(theta)
 
-                    // find the actual x and z
-                    const x1 = -Math.sin(yaw) * h
-                    const z1 = -Math.cos(yaw) * h
+                    // raycast vector components
+                    const x1 = x * h
+                    const z1 = z * h
 
-                    // get vector perpendicular to x and z
+                    // raycast width vector components
                     const x2 = -Math.sin(yaw + PI_HALF) * h
                     const z2 = -Math.cos(yaw + PI_HALF) * h
 
-                    // directional component only vector
                     vectors1[i] = [x1, v, z1]
-                    vectors2[i] = [x2, z2]
+                    vectors2[i] = [x2,    z2]
                 }
             }
 
             {
-                const { x, y, z } = bot.entity.position
-
                 // find where the raycasts intercept with blocks
                 for (let i = 0; i < this.#count; i++) {
 
@@ -68,12 +95,19 @@ module.exports.inject = function inject(bot, Set) {
                             vectors1[i][2] * this.#increment * j
                         )
 
+                        // get absolute positional offset
+                        const offset = bot.entity.position.plus(pos)
+
                         // add horizontal offset for the width
-                        const offset = Math.cos(Math.random() * PI_DOUBLE)
-                        pos.x += vectors2[i][0] * offset * this.#width
-                        pos.z += vectors2[i][1] * offset * this.#width
+                        const random = Math.cos(Math.random() * PI_DOUBLE)
+                        offset.x += vectors2[i][0] * random * this.#width
+                        offset.z += vectors2[i][1] * random * this.#width
+
+                        // set boundingbox offset (half player width)
+                        offset.x += box[0]
+                        offset.z += box[1]
                         
-                        if (bot.blockAt(pos.offset(x, y, z))?.boundingBox === 'block') {
+                        if (bot.blockAt(offset)?.boundingBox === 'block') {
                             cost += 1 - Math.sqrt(pos.x ** 2 + pos.y ** 2 + pos.z ** 2) / this.#radius
                             break
                         }
