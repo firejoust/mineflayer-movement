@@ -1,8 +1,7 @@
 const Heuristics = require("./src/heuristics")
 const Angle = require("./src/angle")
 
-const States = [ "back", "left", "forward", "right" ]
-const PI_DOUBLE = Math.PI * 2
+const States = [ "back", "right", "forward", "left" ]
 
 module.exports.plugin = function inject(bot) {
     bot.movement = new Plugin(bot)
@@ -11,14 +10,14 @@ module.exports.plugin = function inject(bot) {
 function Plugin(bot) {
     this.heuristic = new Heuristics(bot)
 
-    // public
     this.setControls   = setControls
     this.getYaw        = getYaw
     this.steer         = steer
 
     function setControls(yaw, _angleRadius) {
         const angleRadius = Math.PI * ((_angleRadius || 100) / 180)
-        const diff0 = Angle.difference(bot.entity.yaw, yaw % PI_DOUBLE)
+        
+        const diff0 = Angle.difference(bot.entity.yaw, yaw)
         const diff1 = Angle.inverse(diff0)
 
         let index = 0
