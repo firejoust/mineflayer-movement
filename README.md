@@ -98,7 +98,7 @@ bot.movement.heuristic.register(type, label?)
 bot.movement.heuristic.get(label)
 
 /*
-  Returns the optimal yaw angle to face in any given tick.
+  Returns the optimal yaw angle in any given tick.
   
   Arguments:
   fov       (Number, optional) The player's frame of vision, in degrees (Default: 240)
@@ -108,7 +108,7 @@ bot.movement.heuristic.get(label)
 bot.movement.getYaw(fov?, rotations?, blend?)
 
 /*
-  Abstraction of bot.look; steers towards the yaw specified and returns a promise.
+  Abstraction of bot.look; steers towards the yaw angle specified and returns a promise.
   
   Arguments:
   yaw   (Number) The yaw that the player will face
@@ -116,4 +116,3 @@ bot.movement.getYaw(fov?, rotations?, blend?)
 */
 bot.movement.steer(yaw, force?)
 ```
-
