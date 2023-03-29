@@ -4,8 +4,8 @@ const PI_RATIO = Math.PI / 180
 
 module.exports.inject = function inject(bot, Set) {
     return class Distance {
-        #weight    = 1
-        #radius    = 5
+        #weight    = 0.4
+        #radius    = 10
         #spread    = 40
         #count     = 5
         #increment = 0.2

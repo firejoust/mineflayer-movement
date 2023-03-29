@@ -1,9 +1,9 @@
 module.exports.inject = function inject(bot, Set) {
     return class Danger {
-        #weight    = 1
-        #radius    = 5
-        #count     = 20
-        #depth     = 3
+        #weight    = 0.6
+        #radius    = 3
+        #count     = 6
+        #depth     = 2
         #descend   = false
         #increment = 0.2
 

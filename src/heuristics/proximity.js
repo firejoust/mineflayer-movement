@@ -3,7 +3,7 @@ const Angle  = require("../angle")
 
 module.exports.inject = function inject(bot, Set) {
     return class Proximity {
-        #weight = 1
+        #weight = 0.6
         #target = null
         #avoid  = false
 
