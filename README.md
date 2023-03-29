@@ -7,5 +7,6 @@
 </div>
 
 ### Description
+"mineflayer-movement" is a plugin for mineflayer that allows for real-time terrain navigation without the need for a complex pathfinding algorithm. Instead of finding a pre-determined path, it behaves similarly to a real player, using raycasting within a certain field of vision to move around the environment. This gives the bot an advantage in terms of responsiveness, agility and performance.
 
-Mineflayer-movement is an alternate navigation plugin for mineflayer, enabling real-time terrain navigation without using a complex pathfinding algorithm. As opposed to discovering a predefined path, it behaves in the same way as a real player, using raycast heuristics to detect the environment within a certain range of sight. The plugin's heuristics can be used to modify the bot's behaviour, allowing it to respond to changing conditions and obstacles in real time. This makes it ideal for use in situations where pathfinding is not effective, such as PVP, following a player, etc.
+Heuristics are used to modify behaviour, customising the bot's response to changing conditions and obstacles. This makes it ideal for situations where pathfinding isn't as effective, such as PVP or following a player. However, given it is unreliable over long distances, it should not be used for long-distance travel, or where destination accuracy is crucial (Ie. getting to a specific coordinate)
