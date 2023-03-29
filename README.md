@@ -12,9 +12,9 @@
 - Real time adaption to rapidly changing terrain conditions
 
 ### Description
-"mineflayer-movement" is a plugin for mineflayer that allows for real-time terrain navigation without the need for a complex pathfinding algorithm. Instead of following a pre-determined path, it behaves similarly to a real player, using raycasting within a certain field of vision to move around the environment. This gives the bot an advantage in terms of responsiveness, agility and performance.
+"mineflayer-movement" is a mineflayer plugin that allows for real-time terrain navigation without using a complex pathfinding algorithm. Instead of following a pre-determined path, it behaves similarly to a real player, using raycasting within a certain field of vision to move around the environment. This gives the bot an advantage in terms of responsiveness, agility and performance.
 
-Heuristics are used to modify behaviour, customising the bot's response to changing conditions and obstacles. This makes it ideal for situations where pathfinding isn't as effective, such as PVP or following a player. However, given it is unreliable over long distances, it should not be used for long-distance travel, or where destination accuracy is crucial (Ie. getting to a specific coordinate)
+Heuristics are used to modify behaviour, customising the bot's response to changing conditions and obstacles. This makes it ideal for situations where pathfinding isn't as effective, such as PVP or following a player. However, given it is unreliable over long distances, it should not be used where accuracy is crucial (Ie. getting to a specific coordinate)
 
 ### Heuristics
 There are currently 4 heuristics that can be used:
@@ -81,7 +81,7 @@ type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity'
 #### Methods
 ```js
 /*
-  Registers a new heuristic. Returns an instance of the heuristic, allowing access to its setters.
+  Registers a new heuristic. Returns a new instance of the heuristic, allowing access to its setters.
   
   Arguments:
   type  (HeuristicType) The type of heuristic that is being assigned
@@ -90,7 +90,7 @@ type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity'
 bot.movement.heuristic.register(type, label?)
 
 /*
-  Returns a previous instance of a heuristic by its label, allowing access to its setters.
+  Returns a previous instance of a heuristic, allowing access to its setters.
   
   Arguments:
   label (String) The registered heuristic's label
