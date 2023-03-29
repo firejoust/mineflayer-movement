@@ -17,6 +17,10 @@
 Heuristics are used to modify behaviour, customising the bot's response to changing conditions and obstacles. This makes it ideal for situations where pathfinding isn't as effective, such as PVP or following a player. However, given it is unreliable over long distances, it should not be used where accuracy is crucial (Ie. getting to a specific coordinate)
 
 ### Heuristics
+- Generally, each heuristic will generate a "cost" of 0 to 1 for each rotation.
+- The rotation with the lowest average cost will be the yaw angle returned by `getYaw`.
+- All registered heuristics carry a "weight" acting as a multiplier on the final cost.
+
 There are currently 4 heuristics that can be used:
 1. Distance (Checks for vertical block obstruction in a certain direction)
 2. Danger (Verifies the average terrain depth in a certain direction)
@@ -76,7 +80,8 @@ bot.once("spawn", function start() {
 ### API
 #### Types
 ```ts
-type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity'
+type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity';
+type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
 ```
 #### Methods
 ```js
@@ -115,4 +120,30 @@ bot.movement.getYaw(fov?, rotations?, blend?)
   force (Boolean, optional) Whether to snap towards the given yaw. (Default: true)
 */
 bot.movement.steer(yaw, force?)
+```
+### Setters
+- Heuristic behaviour such as radius, weight, etc. can be modified by accessing its setters.
+- It is important to have a good understanding of how a heuristic works before modifying the default values.
+```js
+bot.movement.heuristic.register('distance')
+  .weight(number)
+  .radius(number)
+  .count(number)
+  .spread(number)
+  .increment(number)
+  
+bot.movement.heuristic.register('danger')
+  .weight(number)
+  .radius(number)
+  .count(number)
+  .depth(number)
+  .increment(number)
+  .descend(boolean)
+  
+bot.movement.heuristic.register('proximity')
+  .weight(number)
+  .target(Vec3)
+  
+bot.movement.heuristic.register('conformity')
+  .weight(number)
 ```
