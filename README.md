@@ -72,3 +72,48 @@ bot.once("spawn", function start() {
     })
 })
 ```
+
+### API
+#### Types
+```ts
+type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity'
+```
+#### Methods
+```js
+/*
+  Registers a new heuristic. Returns an instance of the heuristic, allowing access to its setters.
+  
+  Arguments:
+  type  (HeuristicType) The type of heuristic that is being assigned
+  label (String, optional) The heuristic's label; defaults to its type
+*/
+bot.movement.heuristic.register(type, label?)
+
+/*
+  Returns a previous instance of a heuristic by its label, allowing access to its setters.
+  
+  Arguments:
+  label (String) The registered heuristic's label
+*/
+bot.movement.heuristic.get(label)
+
+/*
+  Returns the optimal yaw angle to face in any given tick.
+  
+  Arguments:
+  fov       (Number, optional) The player's frame of vision, in degrees (Default: 240)
+  rotations (Number, optional) How many directions to check within the FOV (Default: 15)
+  blend     (Number, optional) Averages or "blends" adjacent costs in a radius of N rotations (Default: 2)
+*/
+bot.movement.getYaw(fov?, rotations?, blend?)
+
+/*
+  Abstraction of bot.look; steers towards the yaw specified and returns a promise.
+  
+  Arguments:
+  yaw   (Number) The yaw that the player will face
+  force (Boolean, optional) Whether to snap towards the given yaw. (Default: true)
+*/
+bot.movement.steer(yaw, force?)
+```
+
