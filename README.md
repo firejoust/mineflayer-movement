@@ -17,11 +17,14 @@
 Heuristics are used to modify behaviour, customising the bot's response to changing conditions and obstacles. This makes it ideal for situations where pathfinding isn't as effective, such as PVP or following a player. However, given it is unreliable over long distances, it should not be used where accuracy is crucial (Ie. getting to a specific coordinate)
 
 ### Heuristics
-- Generally, each heuristic will generate a "cost" of 0 to 1 for each rotation.
-- The rotation with the lowest average cost will be the yaw angle returned by `getYaw`.
-- All registered heuristics carry a "weight" acting as a multiplier on the final cost.
+Here is a general explanation of how heuristics work:
+- Each heuristic will compute a "cost" between 0 to 1 per yaw rotation within the fov.
+- Heuristics are configurable with a "weight" acting as a multiplier on the final cost.
+- The rotation with the lowest cost will be the yaw angle returned by `getYaw`.
 
-There are currently 4 heuristics that can be used:
+Note: The `blend` argument in `getYaw` can be used to get an average of **'𝑛'** adjacent rotation costs *(in both directions)* for all rotations, increasing reliability in finding a suitable angle and reducing the chances of getting stuck.
+
+There are currently **four** heuristics that can be used:
 1. Distance (Checks for vertical block obstruction in a certain direction)
 2. Danger (Verifies the average terrain depth in a certain direction)
 3. Proximity (How close a direction is to target coordinates)
@@ -90,15 +93,15 @@ type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
   
   Arguments:
   type  (HeuristicType) The type of heuristic that is being assigned
-  label (String, optional) The heuristic's label; defaults to its type
+  label (String, optional) The heuristic's unique identifier; defaults to its type
 */
 bot.movement.heuristic.register(type, label?)
 
 /*
-  Returns a previous instance of a heuristic, allowing access to its setters.
+  Returns a registered instance of a heuristic, allowing access to its setters.
   
   Arguments:
-  label (String) The registered heuristic's label
+  label (String) The heuristic's label
 */
 bot.movement.heuristic.get(label)
 
@@ -117,7 +120,7 @@ bot.movement.getYaw(fov?, rotations?, blend?)
   
   Arguments:
   yaw   (Number) The yaw that the player will face
-  force (Boolean, optional) Whether to snap towards the given yaw. (Default: true)
+  force (Boolean, optional) Whether to snap towards the given yaw (Default: true)
 */
 bot.movement.steer(yaw, force?)
 ```
