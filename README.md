@@ -21,8 +21,6 @@ const mineflayer = require("mineflayer")
 const movement = require("mineflayer-movement")
 
 const bot = mineflayer.createBot({
-    host: "localhost",
-    port: 25565,
     username: "bot"
 })
 
@@ -36,26 +34,12 @@ bot.once("login", function init() {
         bot.setControlState("jump", true)
     }
 
-    // load heuristics
+    // load heuristics (use default configuration)
     {
         bot.movement.heuristic.register('distance')
-            .weight(0.3)
-            .count(5)
-            .radius(10)
-            .spread(50)
-            .increment(0.2)
-
         bot.movement.heuristic.register('danger')
-            .weight(0.6)
-            .radius(3)
-            .count(6)
-            .depth(2)
-
         bot.movement.heuristic.register('proximity')
-            .weight(0.6)
-
         bot.movement.heuristic.register('conformity')
-            .weight(0.2)
     }
 })
 
