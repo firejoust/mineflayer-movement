@@ -22,7 +22,7 @@ Here is a general explanation of how heuristics work:
 - Heuristics are configurable with a "weight" acting as a multiplier on the final cost.
 - The rotation with the lowest cost will be the yaw angle returned by `getYaw`.
 
-Note: The `blend` argument in `getYaw` can be used to get an average of **'𝑛'** adjacent rotation costs *(in both directions)* for all rotations, increasing reliability in finding a suitable angle and reducing the chances of getting stuck.
+Note: The `blend` argument in `getYaw` can be used to get an average of **'𝑛'** adjacent rotation costs *(in both directions)* for all rotations, increasing reliability in finding a suitable angle and reducing the chances of getting stuck *(incorrectly selecting a rotation)*
 
 There are currently **four** heuristics that can be used:
 1. Distance (Checks for vertical block obstruction in a certain direction)
