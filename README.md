@@ -20,7 +20,7 @@ Heuristics are used to modify behaviour, customising the bot's response to chang
 There are currently 4 heuristics that can be used:
 1. Distance (Checks for vertical block obstruction in a certain direction)
 2. Danger (Verifies the average terrain depth in a certain direction)
-3. Proximity (How close a direction is for getting to a target position)
+3. Proximity (How close a direction is for getting to target coordinates)
 4. Conformity (How close a direction is to where the bot is currently facing)
 
 ### Installation
