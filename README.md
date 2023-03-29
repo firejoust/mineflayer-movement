@@ -126,24 +126,25 @@ bot.movement.steer(yaw, force?)
 - It is important to have a good understanding of how a heuristic works before modifying the default values.
 ```js
 bot.movement.heuristic.register('distance')
-  .weight(number)
-  .radius(number)
-  .count(number)
-  .spread(number)
-  .increment(number)
+  .weight(number)    // multiplier for final cost
+  .radius(number)    // the length of each raycast
+  .count(number)     // how many rays will be cast vertically
+  .spread(number)    // the total spread of all vertical raycasts, in degrees
+  .increment(number) // distance between block checks
   
 bot.movement.heuristic.register('danger')
-  .weight(number)
-  .radius(number)
-  .count(number)
-  .depth(number)
-  .increment(number)
-  .descend(boolean)
+  .weight(number)    // multiplier for the final cost
+  .radius(number)    // the length of the initial raycast
+  .count(number)     // how many rays will be cast downwards
+  .depth(number)     // the maximum depth of the downwards raycasts
+  .increment(number) // distance between block checks
+  .descend(boolean)  // whether to favour depth rather than avoid it (reverses cost)
   
 bot.movement.heuristic.register('proximity')
-  .weight(number)
-  .target(Vec3)
+  .weight(number) // multiplier for the final cost
+  .target(Vec3)   // the proximity target/destination coordinates
+  .avoid(boolean) // whether to avoid the target (reverses cost)
   
 bot.movement.heuristic.register('conformity')
-  .weight(number)
+  .weight(number) // multiplier for the final cost
 ```
