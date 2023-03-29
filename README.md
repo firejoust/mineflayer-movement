@@ -8,8 +8,8 @@
 
 ### Features
 - Smooth and realistic player movement towards a destination
-- Obstacle avoidance including blocks, walls, holes, players, etc.
-- Real time adaption to rapidly changing terrain conditions
+- Obstacle avoidance including blocks, holes, walls, players, etc.
+- Real time adaption to actively changing terrain conditions
 
 ### Description
 "mineflayer-movement" is a mineflayer plugin that allows for real-time terrain navigation without using a complex pathfinding algorithm. Instead of following a pre-determined path, it behaves similarly to a real player, using raycasting within a certain field of vision to move around the environment. This gives the bot an advantage in terms of responsiveness, agility and performance.
