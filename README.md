@@ -131,8 +131,9 @@ bot.movement.steer(yaw, force?)
 bot.movement.heuristic.register('distance')
   .weight(number)    // multiplier for final cost
   .radius(number)    // the length of each raycast
-  .count(number)     // how many rays will be cast vertically
   .spread(number)    // the total spread of all vertical raycasts, in degrees
+  .offset(number)    // the vertical raycast offset from the player's feet
+  .count(number)     // how many rays will be cast vertically
   .increment(number) // distance between block checks
   
 bot.movement.heuristic.register('danger')

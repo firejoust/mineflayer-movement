@@ -7,12 +7,14 @@ module.exports.inject = function inject(bot, Set) {
         #weight    = 0.4
         #radius    = 10
         #spread    = 40
+        #offset    = 0
         #count     = 5
         #increment = 0.2
 
         weight    = Set(this, weight => this.#weight = weight)
         radius    = Set(this, radius => this.#radius = radius)
         spread    = Set(this, spread => this.#spread = spread)
+        offset    = Set(this, offset => this.#offset = offset)
         count     = Set(this, count => this.#count = count)
         increment = Set(this, increment => this.#increment = increment)
 
@@ -79,6 +81,9 @@ module.exports.inject = function inject(bot, Set) {
                         // set boundingbox offset (half player width)
                         offset.x += box[0]
                         offset.z += box[1]
+
+                        // configurable vertical offset
+                        offset.y += this.#offset
                         
                         if (bot.blockAt(offset)?.boundingBox === 'block') {
                             cost += 1 - Math.sqrt(pos.x ** 2 + pos.y ** 2 + pos.z ** 2) / this.#radius
