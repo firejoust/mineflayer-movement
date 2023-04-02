@@ -12,7 +12,7 @@ module.exports.inject = function inject(bot, Set) {
         avoid  = Set(this, avoid => this.#avoid = avoid)
 
         cost(yaw) {
-            Assert.ok(this.#target, "Proximity target has not been set (null)")
+            if (this.#target === null) return 0
 
             // get the shortest angle difference
             const angle = Math.atan2(
