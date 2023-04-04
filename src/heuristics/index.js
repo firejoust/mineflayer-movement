@@ -21,6 +21,29 @@ module.exports = function Heuristics(bot) {
     return new class Plugin {
         active = {}
 
+        setGoal(goal) {
+            this.active = goal
+        }
+
+        new(type) {
+            switch (type) {
+                case 'distance':
+                    return new Heuristics.Distance()
+
+                case 'danger':
+                    return new Heuristics.Danger()
+
+                case 'proximity':
+                    return new Heuristics.Proximity()
+                    
+                case 'conformity':
+                    return new Heuristics.Conformity()
+
+                default:
+                    throw new TypeError("Invalid heuristic type specified!")
+            }
+        }
+
         register(type, label) {
             const _label = label || type
 

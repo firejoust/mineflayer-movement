@@ -7,12 +7,29 @@ module.exports.plugin = function inject(bot) {
     bot.movement = new Plugin(bot)
 }
 
+function Goal(heuristicMap) {
+    for (let label in heuristicMap) {
+        this[label] = heuristicMap[label]
+    }
+}
+
 function Plugin(bot) {
     this.heuristic = new Heuristics(bot)
 
-    this.setControls   = setControls
-    this.getYaw        = getYaw
-    this.steer         = steer
+    this.setControls = setControls
+    this.setGoal     = setGoal
+    this.getYaw      = getYaw
+    this.steer       = steer
+    this.Goal        = Goal
+
+    function steer(yaw, _force) {
+        const force = _force || true
+        return bot.look(yaw, bot.entity.pitch, force)
+    }
+
+    function setGoal(goal) {
+        this.heuristic.setGoal(goal)
+    }
 
     function setControls(yaw, _angleRadius) {
         const angleRadius = Math.PI * ((_angleRadius || 100) / 180)
@@ -100,10 +117,5 @@ function Plugin(bot) {
 
             return base + increment * cheapest
         }
-    }
-
-    function steer(yaw, _force) {
-        const force = _force || true
-        return bot.look(yaw, bot.entity.pitch, force)
     }
 }
