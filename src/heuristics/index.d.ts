@@ -4,8 +4,6 @@ class Heuristic {
     cost: (yaw: number) => number;
 }
 
-type Set<T, G> = (instance: T, callback: (...args: G[]) => void) => (...args: G[]) => T;
-
 class Distance extends Heuristic {
     weight: (weight: number) => this
     radius: (radius: number) => this;
@@ -37,7 +35,14 @@ class Conformity extends Heuristic {
 
 type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity';
 
+type HeuristicsMap = {
+    distance: Distance,
+    danger: Danger,
+    proximity: Proximity,
+    conformity: Conformity
+}
+
 export type Heuristics = {
-    register: (type: HeuristicType, label?: string) => Distance | Danger | Proximity | Conformity,
-    get: (label: string) => Distance | Danger | Proximity | Conformity
+    register: <Type extends HeuristicType>(type: Type, label?: string) => HeuristicsMap[Type],
+    get: <Label extends HeuristicType>(label: string | Label) => HeuristicsMap[Label]
 }
