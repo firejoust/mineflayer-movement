@@ -151,4 +151,5 @@ bot.movement.heuristic.register('proximity')
   
 bot.movement.heuristic.register('conformity')
   .weight(number) // multiplier for the final cost
+  .avoid(boolean) // avoid travelling in the same direction (reverses cost)
 ```
