@@ -1,4 +1,3 @@
-const Assert = require("assert")
 const Angle  = require("../angle")
 
 module.exports.inject = function inject(bot, Set) {
@@ -20,12 +19,12 @@ module.exports.inject = function inject(bot, Set) {
                 bot.entity.position.z - this.#target.z
             )
 
-            // calculate the cost
-            const cost = this.#avoid
-            ? 1 - Math.abs(Angle.difference(yaw, angle) / Math.PI)
-            : Math.abs(Angle.difference(yaw, angle) / Math.PI)
-
-            return cost * this.#weight
+            // reverse cost weight if avoid is enabled
+            if (this.#avoid) {
+                return this.#weight * (1 - Math.abs(Angle.difference(yaw, angle) / Math.PI))
+            } else {
+                return this.#weight * Math.abs(Angle.difference(yaw, angle) / Math.PI)
+            }
         }
     }
 }
