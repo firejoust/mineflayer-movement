@@ -18,6 +18,16 @@ module.exports.inject = function inject(bot, Set) {
         count     = Set(this, count => this.#count = count)
         increment = Set(this, increment => this.#increment = increment)
 
+        configure = Set(this, object => {
+            for (let key in object) {
+                try {
+                    this[key](object[key])
+                } catch (e) {
+                    throw new Error(`Cannot configure invalid heuristic option ${key}`)
+                }
+            }
+        })
+
         cost(yaw) {
             let cost = 0
             const vectors1 = new Array(this.#count) // raycast direction

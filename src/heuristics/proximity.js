@@ -10,6 +10,16 @@ module.exports.inject = function inject(bot, Set) {
         target = Set(this, target => this.#target = target)
         avoid  = Set(this, avoid => this.#avoid = avoid)
 
+        configure = Set(this, object => {
+            for (let key in object) {
+                try {
+                    this[key](object[key])
+                } catch (e) {
+                    throw new Error(`Cannot configure invalid heuristic option ${key}`)
+                }
+            }
+        })
+
         cost(yaw) {
             if (this.#target === null) return 0
 

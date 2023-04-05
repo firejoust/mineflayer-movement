@@ -14,6 +14,16 @@ module.exports.inject = function inject(bot, Set) {
         descend   = Set(this, descend => this.#descend = descend)
         increment = Set(this, increment => this.#increment = increment)
 
+        configure = Set(this, object => {
+            for (let key in object) {
+                try {
+                    this[key](object[key])
+                } catch (e) {
+                    throw new Error(`Cannot configure invalid heuristic option ${key}`)
+                }
+            }
+        })
+
         cost(yaw) {
             let cost = 0
             let radius = this.#radius

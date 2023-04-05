@@ -1,39 +1,40 @@
-import { Vec3 } from "vec3";
+import { Vec3 } from "vec3"
 
 declare class Heuristic {
-    cost: (yaw: number) => number;
+    configure: (object: object) => this
+    cost: (yaw: number) => number
 }
 
 declare class Distance extends Heuristic {
     weight: (weight: number) => this
-    radius: (radius: number) => this;
-    spread: (spread: number) => this;
-    offset: (offset: number) => this;
-    count: (count: number) => this;
-    increment: (increment: number) => this;
+    radius: (radius: number) => this
+    spread: (spread: number) => this
+    offset: (offset: number) => this
+    count: (count: number) => this
+    increment: (increment: number) => this
 }
 
 declare class Danger extends Heuristic {
-    weight: (weight: number) => this;
-    radius: (radius: number) => this;
-    count: (count: number) => this;
-    depth: (depth: number) => this;
-    increment: (increment: number) => this;
-    descent: (descent: boolean) => this;
+    weight: (weight: number) => this
+    radius: (radius: number) => this
+    count: (count: number) => this
+    depth: (depth: number) => this
+    increment: (increment: number) => this
+    descent: (descent: boolean) => this
 }
 
 declare class Proximity extends Heuristic {
-    weight: (weight: number) => this;
-    target: (target: Vec3) => this;
-    avoid: (avoid: boolean) => this;
+    weight: (weight: number) => this
+    target: (target: Vec3) => this
+    avoid: (avoid: boolean) => this
 }
 
 declare class Conformity extends Heuristic {
-    weight: (weight: number) => this;
-    avoid: (avoid: boolean) => this;
+    weight: (weight: number) => this
+    avoid: (avoid: boolean) => this
 }
 
-type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity';
+type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity'
 
 type HeuristicsMap = {
     distance: Distance,
