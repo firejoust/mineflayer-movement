@@ -87,24 +87,8 @@ type HeuristicType = 'distance' | 'danger' | 'proximity' | 'conformity';
 type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
 ```
 #### Methods
+
 ```js
-/*
-  Registers a new heuristic. Returns a new instance of the heuristic, allowing access to its setters.
-  
-  Arguments:
-  type  (HeuristicType) The type of heuristic that is being assigned
-  label (String, optional) The heuristic's unique identifier; defaults to its type
-*/
-bot.movement.heuristic.register(type, label?)
-
-/*
-  Returns a registered instance of a heuristic, allowing access to its setters.
-  
-  Arguments:
-  label (String) The heuristic's label
-*/
-bot.movement.heuristic.get(label)
-
 /*
   Returns the optimal yaw angle in any given tick.
   
@@ -124,7 +108,34 @@ bot.movement.getYaw(fov?, rotations?, blend?)
 */
 bot.movement.steer(yaw, force?)
 ```
-### Setters
+#### Methods - Heuristics
+```js
+/*
+  Returns a new heuristic instance.
+  
+  Arguments:
+  type (HeuristicType) The type of heuristic that is being assigned
+*/
+bot.movement.heuristic.new(type)
+
+/*
+  Registers a new heuristic instance and returns it.
+  
+  Arguments:
+  type  (HeuristicType) The type of heuristic that is being assigned
+  label (String, optional) The heuristic's unique identifier; defaults to its type
+*/
+bot.movement.heuristic.register(type, label?)
+
+/*
+  Returns a previously registered heuristic.
+  
+  Arguments:
+  label (String) The heuristic's label
+*/
+bot.movement.heuristic.get(label)
+```
+#### Configuration - Setters
 - Heuristic behaviour such as radius, weight, etc. can be modified by accessing its setters.
 - It is important to have a good understanding of how a heuristic works before modifying the default values.
 ```js
@@ -152,4 +163,39 @@ bot.movement.heuristic.register('proximity')
 bot.movement.heuristic.register('conformity')
   .weight(number) // multiplier for the final cost
   .avoid(boolean) // avoid travelling in the same direction (reverses cost)
+```
+#### Configuration - Objects
+- Alternatively, heuristics can be configured using a key/value object for more concise syntax:
+```js
+// Example!
+
+bot.movement.heuristic.register('distance')
+  .configure({
+    weight?: number,
+    radius?: number,
+    spread?: number,
+    offset?: number,
+    count?: number,
+    increment?: number
+  })
+```
+#### Configuration - Goals
+- Goals provide an effective way of combining multiple heuristics to achieve a desired movement pattern.
+- This makes it easier to reconfigure multiple heuristics at once, particularly for changing terrain conditions.
+```ts
+// Example!
+
+const MovementGoal = new bot.movement.Goal({
+  'distance': bot.movement.heuristic.new('distance')
+    .configure({
+      weight?: number,
+      radius?: number,
+      spread?: number,
+      offset?: number,
+      count?: number,
+      increment?: number
+    })
+})
+
+bot.movement.setGoal(MovementGoal)
 ```
