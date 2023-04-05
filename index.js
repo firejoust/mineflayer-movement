@@ -2,7 +2,9 @@ const Heuristics = require("./src/heuristics")
 const Goals = require("./src/goals")
 
 module.exports.plugin = function inject(bot) {
-    bot.movement = new Plugin(bot)
+    bot.movement           = new Plugin(bot)
+    bot.movement.heuristic = new Heuristics(bot)
+    bot.movement.goals     = new Goals(bot)
 }
 
 function Goal(heuristicMap) {
@@ -12,9 +14,6 @@ function Goal(heuristicMap) {
 }
 
 function Plugin(bot) {
-    this.heuristic = new Heuristics(bot)
-    this.goals     = new Goals(bot)
-    
     this.setGoal   = setGoal
     this.getYaw    = getYaw
     this.steer     = steer
