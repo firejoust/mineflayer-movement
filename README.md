@@ -48,20 +48,13 @@ const bot = mineflayer.createBot({
 bot.loadPlugin(movement.plugin)
 
 bot.once("login", function init() {
+    // load heuristics with default configuration
+    const { Default } = bot.movement.goals
+    bot.movement.setGoal(Default)
     // set control states
-    {
-        bot.setControlState("forward", true)
-        bot.setControlState("sprint", true)
-        bot.setControlState("jump", true)
-    }
-
-    // load heuristics (use default configuration)
-    {
-        bot.movement.heuristic.register('distance')
-        bot.movement.heuristic.register('danger')
-        bot.movement.heuristic.register('proximity')
-        bot.movement.heuristic.register('conformity')
-    }
+    bot.setControlState("forward", true)
+    bot.setControlState("sprint", true)
+    bot.setControlState("jump", true)
 })
 
 bot.once("spawn", function start() {
@@ -71,10 +64,9 @@ bot.once("spawn", function start() {
             // set the proximity target to the nearest entity
             bot.movement.heuristic.get('proximity')
                 .target(entity.position)
-            
             // move towards the nearest entity
-            const yaw = bot.movement.getYaw(160, 15, 2)
-            bot.movement.steer(yaw, true)
+            const yaw = bot.movement.getYaw(240, 15, 2)
+            bot.movement.steer(yaw)
         }
     })
 })
@@ -90,7 +82,7 @@ type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
 
 ```js
 /*
-  Initialises a new heuristic goal from the heuristics specified.
+  Initialises a new goal from the heuristics specified.
   
   Arguments:
   heuristics (object): A key/value object mapping labels to heuristics
@@ -98,7 +90,7 @@ type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
 const goal = new bot.movement.Goal(heuristics)
 
 /*
-  Resets and sets all registered heuristics from the goal specified.
+  Resets and registers all heuristics using the goal specified.
   
   Arguments:
   goal (Goal) The goal containing the new heuristics to be registered
