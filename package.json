@@ -18,7 +18,7 @@
   },
   "homepage": "https://github.com/firejoust/mineflayer-movement#readme",
   "dependencies": {
-    "mineflayer": "^4.8.1",
-    "vec3": "^0.1.8"
+    "mineflayer": "^4.4.0",
+    "vec3": "^0.1.7"
   }
 }
