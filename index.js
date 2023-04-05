@@ -1,7 +1,4 @@
 const Heuristics = require("./src/heuristics")
-const Angle = require("./src/angle")
-
-const States = [ "back", "right", "forward", "left" ]
 
 module.exports.plugin = function inject(bot) {
     bot.movement = new Plugin(bot)
@@ -15,12 +12,10 @@ function Goal(heuristicMap) {
 
 function Plugin(bot) {
     this.heuristic = new Heuristics(bot)
-
-    this.setControls = setControls
-    this.setGoal     = setGoal
-    this.getYaw      = getYaw
-    this.steer       = steer
-    this.Goal        = Goal
+    this.setGoal   = setGoal
+    this.getYaw    = getYaw
+    this.steer     = steer
+    this.Goal      = Goal
 
     function steer(yaw, _force) {
         const force = _force || true
@@ -29,32 +24,6 @@ function Plugin(bot) {
 
     function setGoal(goal) {
         this.heuristic.setGoal(goal)
-    }
-
-    function setControls(yaw, _angleRadius) {
-        const angleRadius = Math.PI * ((_angleRadius || 100) / 180)
-        
-        const diff0 = Angle.difference(bot.entity.yaw, yaw)
-        const diff1 = Angle.inverse(diff0)
-
-        let index = 0
-
-        // create a radius for each cardinal direction
-        for (let i = -Math.PI; i < Math.PI; i += Math.PI/2) {
-
-            // original angle radius
-            let x0, x1
-            x0 = i - angleRadius / 2
-            x1 = i + angleRadius / 2
-
-            // enable control state if destination angle within radius
-            x0 <= diff0 && diff0 <= x1 || x1 <= diff0 && diff0 <= x0 ||
-            x1 <= diff1 && diff1 <= x0 || x0 <= diff1 && diff1 <= x1
-            ? bot.setControlState(States[index], true)
-            : bot.setControlState(States[index], false)
-            // next state
-            index++
-        }
     }
 
     function getYaw(_fov, _rotations, _blend) {
