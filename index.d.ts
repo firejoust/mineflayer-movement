@@ -1,8 +1,13 @@
 import { Bot } from "mineflayer"
 import { Heuristics, Goal } from "./src/heuristics/"
 
-export interface Movement {
+declare interface Goals {
+    Default: Goal
+}
+
+declare interface Movement {
     heuristic: Heuristics
+    goals: Goals
     Goal: (heuristics: object) => Goal
     setGoal: (goal: Goal) => void
     getYaw: (fov?: number, rotations?: number, blend?: number) => number
