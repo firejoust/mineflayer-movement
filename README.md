@@ -90,6 +90,22 @@ type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
 
 ```js
 /*
+  Initialises a new heuristic goal from the heuristics specified.
+  
+  Arguments:
+  heuristics (object): A key/value object mapping labels to heuristics
+*/
+const goal = new bot.movement.Goal(heuristics)
+
+/*
+  Resets and sets all registered heuristics from the goal specified.
+  
+  Arguments:
+  goal (Goal) The goal containing the new heuristics to be registered
+*/
+bot.movement.setGoal(goal)
+
+/*
   Returns the optimal yaw angle in any given tick.
   
   Arguments:
@@ -97,7 +113,7 @@ type Vec3 = { x, y, z }; // https://github.com/PrismarineJS/node-vec3
   rotations (Number, optional) How many directions to check within the FOV (Default: 15)
   blend     (Number, optional) Averages or "blends" adjacent costs in a radius of N rotations (Default: 2)
 */
-bot.movement.getYaw(fov?, rotations?, blend?)
+const yaw = bot.movement.getYaw(fov?, rotations?, blend?)
 
 /*
   Abstraction of bot.look; steers towards the yaw angle specified and returns a promise.
