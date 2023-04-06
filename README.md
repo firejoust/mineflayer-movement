@@ -65,7 +65,7 @@ bot.once("spawn", function start() {
             bot.movement.heuristic.get('proximity')
                 .target(entity.position)
             // move towards the nearest entity
-            const yaw = bot.movement.getYaw(240, 15, 2)
+            const yaw = bot.movement.getYaw(240, 15, 1)
             bot.movement.steer(yaw)
         }
     })
@@ -102,8 +102,8 @@ bot.movement.setGoal(goal)
   
   Arguments:
   fov       (Number, optional) The player's frame of vision, in degrees (Default: 240)
-  rotations (Number, optional) How many directions to check within the FOV (Default: 25)
-  blend     (Number, optional) Averages or "blends" adjacent costs in a radius of N rotations (Default: 2)
+  rotations (Number, optional) How many directions to check within the FOV (Default: 15)
+  blend     (Number, optional) Averages or "blends" adjacent costs in a radius of N rotations (Default: 1)
 */
 const yaw = bot.movement.getYaw(fov?, rotations?, blend?)
 
