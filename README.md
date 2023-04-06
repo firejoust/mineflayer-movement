@@ -26,9 +26,9 @@ Note: The `blend` argument in `getYaw` can be used to get an average of **'𝑛'
 
 There are currently **four** heuristics that can be used:
 1. Distance (Checks for vertical block obstruction in a certain direction)
-2. Danger (Verifies the average terrain depth in a certain direction)
-3. Proximity (How close a direction is to target coordinates)
-4. Conformity (How close a direction is to where the bot is currently facing)
+2. Danger (Checks for dangerous blocks and hazardous depth in a certain direction)
+3. Proximity (Checks how close a direction is to the target coordinates)
+4. Conformity (Checks how close a direction is to where the bot is currently facing)
 
 ### Installation
 - Using npm, install the package into your project directory:
@@ -102,7 +102,7 @@ bot.movement.setGoal(goal)
   
   Arguments:
   fov       (Number, optional) The player's frame of vision, in degrees (Default: 240)
-  rotations (Number, optional) How many directions to check within the FOV (Default: 15)
+  rotations (Number, optional) How many directions to check within the FOV (Default: 25)
   blend     (Number, optional) Averages or "blends" adjacent costs in a radius of N rotations (Default: 2)
 */
 const yaw = bot.movement.getYaw(fov?, rotations?, blend?)
@@ -149,19 +149,18 @@ bot.movement.heuristic.get(label)
 ```js
 bot.movement.heuristic.register('distance')
   .weight(number)    // multiplier for final cost
-  .radius(number)    // the length of each raycast
-  .spread(number)    // the total spread of all vertical raycasts, in degrees
-  .offset(number)    // the vertical raycast offset from the player's feet
-  .count(number)     // how many rays will be cast vertically
+  .radius(number)    // how far each raycast will travel
+  .height(number)    // maximum height that raycasts can climb blocks
   .increment(number) // distance between block checks
   
 bot.movement.heuristic.register('danger')
-  .weight(number)    // multiplier for the final cost
-  .radius(number)    // the length of the initial raycast
-  .count(number)     // how many rays will be cast downwards
-  .depth(number)     // the maximum depth of the downwards raycasts
-  .increment(number) // distance between block checks
-  .descend(boolean)  // whether to favour depth rather than avoid it (reverses cost)
+  .weight(number)     // multiplier for the final cost
+  .radius(number)     // the length of the initial raycast
+  .height(number)     // maximum height that raycasts can climb blocks
+  .descent(number)    // maximum depth that raycasts can descend
+  .depth(number)      // fall height
+  .increment(number)  // distance between block checks
+  .avoid(...string[]) // a list of dangerous blocks to avoid
   
 bot.movement.heuristic.register('proximity')
   .weight(number) // multiplier for the final cost
@@ -181,9 +180,7 @@ bot.movement.heuristic.register('distance')
   .configure({
     weight?: number,
     radius?: number,
-    spread?: number,
-    offset?: number,
-    count?: number,
+    height?: number,
     increment?: number
   })
 ```
@@ -198,9 +195,7 @@ const MovementGoal = new bot.movement.Goal({
     .configure({
       weight?: number,
       radius?: number,
-      spread?: number,
-      offset?: number,
-      count?: number,
+      height?: number,
       increment?: number
     })
 })
