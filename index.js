@@ -31,7 +31,7 @@ function Plugin(bot) {
     function getYaw(_fov, _rotations, _blend) {
         const fov = _fov || 240
         const rotations = _rotations || 15
-        const blend = _blend || 2
+        const blend = _blend || 1
 
         let costs = new Float64Array(rotations)
 
