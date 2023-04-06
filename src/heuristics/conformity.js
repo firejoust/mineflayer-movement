@@ -2,7 +2,7 @@ const Angle  = require("../angle")
 
 module.exports.inject = function inject(bot, Set) {
     return class Conformity {
-        #weight = 0.2
+        #weight = 0.25
         #avoid  = false
 
         weight = Set(this, weight => this.#weight = weight)

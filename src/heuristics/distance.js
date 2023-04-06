@@ -2,13 +2,15 @@ const Vec3 = require("vec3")
 
 module.exports.inject = function inject(bot, Set) {
     return class Distance {
-        #weight = 0.4
+        #weight = 0.5
         #radius = 10
+        #height = 8 
         #step   = 1
         #increment = 0.2
 
         weight = Set(this, weight => this.#weight = weight)
         radius = Set(this, radius => this.#radius = radius)
+        height = Set(this, height => this.#height = height)
         //step   = Set(this, step => this.#step = step) // will be supported later
         increment = Set(this, increment => this.#increment = increment)
 
@@ -56,6 +58,10 @@ module.exports.inject = function inject(bot, Set) {
                 )
 
                 for (let j = 0; j < length; j++) {
+                    if (y > this.#height) {
+                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                    }
+
                     const offset = new Float64Array(2)
                     offset[0] = x * this.#increment * j
                     offset[1] = z * this.#increment * j
