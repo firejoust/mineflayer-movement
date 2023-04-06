@@ -1,6 +1,6 @@
 {
   "name": "mineflayer-movement",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "description": "Raycast based 3D terrain navigation plugin for mineflayer",
   "main": "index.js",
   "scripts": {
