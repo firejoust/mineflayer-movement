@@ -1,15 +1,26 @@
+const Vec3 = require("vec3")
+
 module.exports.inject = function inject(bot, Set) {
     return class Danger {
-        #weight    = 0.6
-        #radius    = 3
-        #step      = 1
-        #depth     = 2
+        #weight = 0.4
+        #radius = 4
+        #step   = 1
+        #height = 4
+        #depth  = 3
+        #descent   = 3
         #increment = 0.2
+        #avoid = [
+            'lava',
+            'water'
+        ]
 
         weight    = Set(this, weight => this.#weight = weight)
         radius    = Set(this, radius => this.#radius = radius)
         //step   = Set(this, step => this.#step = step) // will be supported later
+        height = Set(this, height => this.#height = height)
         depth     = Set(this, depth => this.#depth = depth)
+        descent = Set(this, descent => this.#descent = descent)
+        avoid     = Set(this, (...args) => this.#avoid = args)
         increment = Set(this, increment => this.#increment = increment)
 
         configure = Set(this, object => {
@@ -45,6 +56,9 @@ module.exports.inject = function inject(bot, Set) {
             {
                 let y = 0
 
+                const maxAscent = this.#height
+                const maxDescent = -this.#descent
+
                 // how many iterations will be executed
                 const length = this.#radius / this.#increment
 
@@ -56,6 +70,10 @@ module.exports.inject = function inject(bot, Set) {
                 )
 
                 for (let j = 0; j < length; j++) {
+                    if (maxAscent < y && y < maxDescent) {
+                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                    }
+
                     const offset = new Float64Array(2)
                     offset[0] = x * this.#increment * j
                     offset[1] = z * this.#increment * j
@@ -66,7 +84,7 @@ module.exports.inject = function inject(bot, Set) {
                     // set boundingbox offset (half player width)
                     pos.x += box[0]
                     pos.z += box[1]
-                    
+
                     // check the raycast at step height for an intercept
                     if (bot.blockAt(pos.offset(0, this.#step, 0))?.boundingBox === 'block') {
                         return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
@@ -96,20 +114,39 @@ module.exports.inject = function inject(bot, Set) {
                         }
                     } else
 
-                    // descend if the floor is empty
-                    // wip
-                    if (bot.blockAt(pos.offset(0, -1, 0)).boundingBox === 'empty') {
-                        for (let i = 1; i < this.#depth; i++) {
-                            const block = bot.blockAt(pos.offset(0, -i, 0))
+                    // verify if the player can descend on the current block
+                    {
+                        let landed = false
 
-                            if (block.boundingBox === 'solid') {
-                                y -= i
+                        for (let i = 0; i <= this.#depth; i++) {
+                            const block = bot.blockAt(pos.offset(0, -(i + 1), 0))
+
+                            // air
+                            if (block === null) {
+                                y -= 1
+                                continue
+                            }
+
+                            // verify the block we're standing on isn't dangerous
+                            for (let type of this.#avoid) {
+                                if (block.name === type) {
+                                    return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                                }
+                            }
+
+                            // if it's a solid block, we can ignore it and keep going
+                            if (block.boundingBox === 'block') {
+                                landed = true
                                 break
+                            // descend a single block
+                            } else {
+                                y -= 1
                             }
                         }
 
-                        // too deep
-                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                        if (!landed) {
+                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                        }
                     }
                 }
             }
