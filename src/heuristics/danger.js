@@ -70,12 +70,6 @@ module.exports.inject = function inject(bot, Set) {
                 )
 
                 for (let j = 0; j < length; j++) {
-
-                    // position outside of range; apply cost penalty
-                    if (maxAscent < y && y < maxDescent) {
-                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
-                    }
-
                     const offset = new Float64Array(2)
                     offset[0] = x * this.#increment * j
                     offset[1] = z * this.#increment * j
@@ -86,6 +80,11 @@ module.exports.inject = function inject(bot, Set) {
                     // set boundingbox offset (half player width)
                     pos.x += box[0]
                     pos.z += box[1]
+
+                    // position outside of range; apply cost penalty
+                    if (y > maxAscent || y < maxDescent) {
+                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                    } else
 
                     // check the raycast at step height for an intercept
                     if (bot.blockAt(pos.offset(0, this.#step, 0))?.boundingBox === 'block') {
