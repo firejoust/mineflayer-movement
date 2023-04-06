@@ -2,16 +2,14 @@ module.exports.inject = function inject(bot, Set) {
     return class Danger {
         #weight    = 0.6
         #radius    = 3
-        #count     = 6
+        #step      = 1
         #depth     = 2
-        #descend   = false
         #increment = 0.2
 
         weight    = Set(this, weight => this.#weight = weight)
         radius    = Set(this, radius => this.#radius = radius)
+        //step   = Set(this, step => this.#step = step) // will be supported later
         depth     = Set(this, depth => this.#depth = depth)
-        count     = Set(this, count => this.#count = count)
-        descend   = Set(this, descend => this.#descend = descend)
         increment = Set(this, increment => this.#increment = increment)
 
         configure = Set(this, object => {
@@ -25,98 +23,99 @@ module.exports.inject = function inject(bot, Set) {
         })
 
         cost(yaw) {
-            let cost = 0
-            let radius = this.#radius
-
             const x = -Math.sin(yaw)
             const z = -Math.cos(yaw)
-
             const box = new Float64Array(2)
 
-            if (Math.abs(x) > Math.abs(z)) {
-                box[0] = Math.sign(x)
-                box[1] = z * Math.abs(1 / x)
-            } else {
-                box[0] = x * Math.abs(1 / z)
-                box[1] = Math.sign(z)
+            // initialise player bounding box offset
+            {
+                if (Math.abs(x) > Math.abs(z)) {
+                    box[0] = Math.sign(x)
+                    box[1] = z * Math.abs(1 / x)
+                } else {
+                    box[0] = x * Math.abs(1 / z)
+                    box[1] = Math.sign(z)
+                }
+
+                box[0] *= 0.3
+                box[1] *= 0.3
             }
 
-            box[0] *= 0.3
-            box[1] *= 0.3
-            
+            // find where the raycast intercepts with blocks
             {
-                const total = this.#radius / this.#increment
+                let y = 0
 
-                // verify there's no wall before checking depth
-                for (let i = 0; i < total; i++) {
-                    const x1 = x * this.#increment * i
-                    const z1 = z * this.#increment * i
+                // how many iterations will be executed
+                const length = this.#radius / this.#increment
 
-                    // initial raycast offset
-                    const pos = bot.entity.position.offset(x1, 0, z1)
+                // floor the player's y position to prevent partial block checking
+                const position = new Vec3(
+                    bot.entity.position.x,
+                    Math.floor(bot.entity.position.y),
+                    bot.entity.position.z
+                )
+
+                for (let j = 0; j < length; j++) {
+                    const offset = new Float64Array(2)
+                    offset[0] = x * this.#increment * j
+                    offset[1] = z * this.#increment * j
+
+                    // get absolute positional offset
+                    const pos = position.offset(offset[0], y, offset[1])
+
+                    // set boundingbox offset (half player width)
                     pos.x += box[0]
                     pos.z += box[1]
+                    
+                    // check the raycast at step height for an intercept
+                    if (bot.blockAt(pos.offset(0, this.#step, 0))?.boundingBox === 'block') {
+                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                    } else
 
-                    // initial ray has intercepted with a block
+                    // check the raycast below it to determine if a block can be climbed
                     if (bot.blockAt(pos)?.boundingBox === 'block') {
-                        radius = Math.sqrt(z1 ** 2 + z1 ** 2)
-                        break
+                        const height = new Float64Array(2)
+                        height[0] = x * this.#increment * (j - 1)
+                        height[1] = z * this.#increment * (j - 1)
+
+                        // position of the block above player's head
+                        const lastPos = position.offset(
+                            height[0],
+                            y + this.#step + 1,
+                            height[1]
+                        )
+
+                        lastPos.x += box[0]
+                        lastPos.z += box[1]
+
+                        // check block above the player's head, otherwise climb the block
+                        if (bot.blockAt(lastPos)?.boundingBox === 'block') {
+                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                        } else {
+                            y += this.#step
+                        }
+                    } else
+
+                    // descend if the floor is empty
+                    // wip
+                    if (bot.blockAt(pos.offset(0, -1, 0)).boundingBox === 'empty') {
+                        for (let i = 1; i < this.#depth; i++) {
+                            const block = bot.blockAt(pos.offset(0, -i, 0))
+
+                            if (block.boundingBox === 'solid') {
+                                y -= i
+                                break
+                            }
+                        }
+
+                        // too deep
+                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
                     }
                 }
             }
 
-            {
-                const count = Math.floor(this.#count * radius / this.#radius)
-                const vectors = new Array(count)
-                const increment = radius / count
-
-                // initialise depth check rays
-                for (let i = 0; i < count; i++) {
-                    const x1 = x * increment * i
-                    const z1 = z * increment * i
-                    vectors[i] = [x1, -this.#depth, z1]
-                }
-
-                // find the block depth intercept
-                for (let i = 0; i < count; i++) {
-
-                    const length = this.#depth / this.#increment
-
-                    // skip the first position
-                    for (let j = 0; j <= length; j++) {
-                        // no intercept found
-                        if (j === length) {
-                            cost += 1
-                            break
-                        }
-
-                        // offset depth vector from raycast vector
-                        const x1 = vectors[i][0]
-                        const z1 = vectors[i][2]
-                        const y = this.#increment * -j
-
-                        // set boundingbox offset (half player width)
-                        const pos = bot.entity.position.offset(x1, y, z1)
-                        pos.x += box[0]
-                        pos.z += box[1]
-                        
-                        // depth intercept with block
-                        if (bot.blockAt(pos)?.boundingBox === 'block') {
-                            cost += Math.abs(y) / this.#depth
-                            break
-                        }
-                    }
-                }
-
-                if (count > 0)
-                    cost /= count
-                else
-                    cost = 1
-            }
-
-            return this.#descend
-            ? (1 - cost) * this.#weight
-            : cost * this.#weight
-         }
+            // no intercepts
+            return 0
+        }
     }
 }
