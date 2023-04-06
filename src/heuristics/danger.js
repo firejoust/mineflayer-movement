@@ -70,6 +70,8 @@ module.exports.inject = function inject(bot, Set) {
                 )
 
                 for (let j = 0; j < length; j++) {
+
+                    // position outside of range; apply cost penalty
                     if (maxAscent < y && y < maxDescent) {
                         return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
                     }
@@ -87,7 +89,7 @@ module.exports.inject = function inject(bot, Set) {
 
                     // check the raycast at step height for an intercept
                     if (bot.blockAt(pos.offset(0, this.#step, 0))?.boundingBox === 'block') {
-                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                        return 0 // no penalty for block obstruction
                     } else
 
                     // check the raycast below it to determine if a block can be climbed
@@ -108,7 +110,7 @@ module.exports.inject = function inject(bot, Set) {
 
                         // check block above the player's head, otherwise climb the block
                         if (bot.blockAt(lastPos)?.boundingBox === 'block') {
-                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2, offset[1] ** 2) / this.#radius)
+                            return 0 // no penalty for block obstruction
                         } else {
                             y += this.#step
                         }
