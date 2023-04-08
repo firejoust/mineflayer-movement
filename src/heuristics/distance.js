@@ -108,11 +108,12 @@ module.exports.inject = function inject(bot, Set) {
                 let ceilingCheck = false
 
                 for (let i = 0; i < length; i++) {
+                    // keep track of Y position per raycast per iteration
                     const yOffset = new Float64Array(this.#count).fill(y)
-                    const ceilCheck = ceilingCheck
-                    let yChanged = false // flag for performance reasons
+                    let yChanged = false
 
-                    // reset ceiling check for the current iteration
+                    // check the ceiling when ascending a block
+                    const ceilCheck = ceilingCheck
                     ceilingCheck = false
 
                     // initialise next raycast iterator position
@@ -120,14 +121,14 @@ module.exports.inject = function inject(bot, Set) {
                     offset[0] = x * this.#increment * i
                     offset[1] = z * this.#increment * i
 
-                    // set boundingbox offset from middle of player
-                    offset[0] += box[0]
-                    offset[1] += box[1]
-
                     for (let j = 0; j < this.#count; j++) {
                         const pos = position.offset(offset[0], y, offset[1])
 
-                        // set boundingbox width offset
+                        // set boundingbox offset from middle of player
+                        pos.x += box[0]
+                        pos.z += box[1]
+
+                        // set boundingbox border offset
                         pos.x += xOffset[j]
                         pos.z += zOffset[j]
 
