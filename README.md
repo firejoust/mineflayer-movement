@@ -151,6 +151,7 @@ bot.movement.heuristic.register('distance')
   .weight(number)    // multiplier for final cost
   .radius(number)    // how far each raycast will travel
   .height(number)    // maximum height that raycasts can climb blocks
+  .count(number)     // how many raycasts in a particular direction
   .increment(number) // distance between block checks
   
 bot.movement.heuristic.register('danger')
@@ -158,7 +159,8 @@ bot.movement.heuristic.register('danger')
   .radius(number)     // the length of the initial raycast
   .height(number)     // maximum height that raycasts can climb blocks
   .descent(number)    // maximum depth that raycasts can descend
-  .depth(number)      // fall height
+  .depth(number)      // how deep raycasts can descend
+  .count(number)      // how many raycasts in a particular direction
   .increment(number)  // distance between block checks
   .avoid(...string[]) // a list of dangerous blocks to avoid
   
@@ -181,6 +183,7 @@ bot.movement.heuristic.register('distance')
     weight?: number,
     radius?: number,
     height?: number,
+    count?: number,
     increment?: number
   })
 ```
@@ -196,6 +199,7 @@ const MovementGoal = new bot.movement.Goal({
       weight?: number,
       radius?: number,
       height?: number,
+      count?: number,
       increment?: number
     })
 })
