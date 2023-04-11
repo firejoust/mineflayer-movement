@@ -159,7 +159,7 @@ bot.movement.heuristic.register('danger')
   .radius(number)     // the length of the initial raycast
   .height(number)     // maximum height that raycasts can climb blocks
   .descent(number)    // maximum depth that raycasts can descend
-  .depth(number)      // how deep raycasts can descend
+  .depth(number)      // how deep raycasts can descend from a block
   .count(number)      // how many raycasts in a particular direction
   .increment(number)  // distance between block checks
   .avoid(...string[]) // a list of dangerous blocks to avoid
