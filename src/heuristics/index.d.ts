@@ -5,12 +5,17 @@ declare class Heuristic {
     cost: (yaw: number) => number
 }
 
+type AvoidBlocks = {
+    [name: String]: boolean
+}
+
 declare class Distance extends Heuristic {
     weight: (weight: number) => this
     radius: (radius: number) => this
     spread: (spread: number) => this
     offset: (offset: number) => this
     count: (count: number) => this
+    avoid: (avoid: AvoidBlocks) => this
     increment: (increment: number) => this
 }
 
@@ -18,9 +23,11 @@ declare class Danger extends Heuristic {
     weight: (weight: number) => this
     radius: (radius: number) => this
     count: (count: number) => this
-    depth: (depth: number) => this
-    increment: (increment: number) => this
+    height: (height: number) => this
     descent: (descent: boolean) => this
+    depth: (depth: number) => this
+    avoid: (avoid: AvoidBlocks) => this
+    increment: (increment: number) => this
 }
 
 declare class Proximity extends Heuristic {
