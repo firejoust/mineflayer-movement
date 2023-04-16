@@ -10,6 +10,10 @@ module.exports.inject = function inject(bot, Set) {
         #height = 8
         #step   = 1
         #increment = 0.2
+        #avoid = {
+            'lava': true,
+            'water': true
+        }
 
         weight = Set(this, weight => this.#weight = weight)
         radius = Set(this, radius => this.#radius = radius)
@@ -17,6 +21,7 @@ module.exports.inject = function inject(bot, Set) {
         height = Set(this, height => this.#height = height)
         //step   = Set(this, step => this.#step = step) // will be supported later
         increment = Set(this, increment => this.#increment = increment)
+        avoid     = Set(this, avoid => this.#avoid = avoid)
 
         configure = Set(this, object => {
             for (let key in object) {
@@ -157,29 +162,48 @@ module.exports.inject = function inject(bot, Set) {
                                 lastPos.x += box[0]
                                 lastPos.z += box[1]
 
-                                // check block above the player's head, otherwise climb the block
-                                if (bot.blockAt(lastPos)?.boundingBox === 'block') {
+                                // get the block above the player's head
+                                const block = bot.blockAt(lastPos)
+
+                                // verify the block above the player's head isn't dangerous
+                                if (this.#avoid[block?.name]) {
+                                    return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
+                                } else
+
+                                // verify block above the player's head isn't solid, otherwise climb the block
+                                if (block?.boundingBox === 'block') {
                                     return this.#weight * (1 - Math.sqrt(height[0] ** 2 + height[1] ** 2) / this.#radius)
-                                } else {
-                                    ceilingCheck ||= false // don't stop doing ceiling checks in current iteration
-                                }
+                                } else
+                                
+                                // don't stop doing ceiling checks in current iteration
+                                ceilingCheck ||= false
+                            }
+                        }
+                        
+                        if (y > this.#height) {
+                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
+                        }
+
+                        // check the raycast at step height for an intercept
+                        {
+                            const block = bot.blockAt(pos.offset(0, this.#step, 0))
+                            if (this.#avoid[block?.name] || block?.boundingBox === 'block') {
+                                return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
                             }
                         }
 
-                        if (y > this.#height) {
-                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
-                        } else
-
-                        // check the raycast at step height for an intercept
-                        if (bot.blockAt(pos.offset(0, this.#step, 0))?.boundingBox === 'block') {
-                            return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
-                        } else
-
                         // check the raycast below it to determine if a block can be climbed
-                        if (bot.blockAt(pos)?.boundingBox === 'block') {
-                            ceilingCheck = true // check the last position's ceiling in the next iteration
-                            yChanged = true
-                            yOffset[j] += this.#step
+                        {
+                            const block = bot.blockAt(pos)
+                            if (this.#avoid[block?.name]) {
+                                return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
+                            } else
+
+                            if (block?.boundingBox === 'block') {
+                                ceilingCheck = true // check current position's ceiling in the next iteration
+                                yChanged = true
+                                yOffset[j] += this.#step
+                            }
                         }
                     }
 

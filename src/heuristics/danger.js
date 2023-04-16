@@ -12,10 +12,10 @@ module.exports.inject = function inject(bot, Set) {
         #depth  = 2
         #descent   = 4
         #increment = 0.2
-        #avoid = [
-            'lava',
-            'water'
-        ]
+        #avoid = {
+            'lava': true,
+            'water': true
+        }
 
         weight    = Set(this, weight => this.#weight = weight)
         radius    = Set(this, radius => this.#radius = radius)
@@ -24,7 +24,7 @@ module.exports.inject = function inject(bot, Set) {
         height = Set(this, height => this.#height = height)
         depth     = Set(this, depth => this.#depth = depth)
         descent = Set(this, descent => this.#descent = descent)
-        avoid     = Set(this, (...args) => this.#avoid = args)
+        avoid     = Set(this, avoid => this.#avoid = avoid)
         increment = Set(this, increment => this.#increment = increment)
 
         configure = Set(this, object => {
@@ -208,10 +208,8 @@ module.exports.inject = function inject(bot, Set) {
                                 }
 
                                 // verify the block we're standing on isn't dangerous
-                                for (let type of this.#avoid) {
-                                    if (block.name === type) {
-                                        return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
-                                    }
+                                if (this.#avoid[block.name]) {
+                                    return this.#weight * (1 - Math.sqrt(offset[0] ** 2 + offset[1] ** 2) / this.#radius)
                                 }
 
                                 // if it's a solid block, we can ignore it and keep going
