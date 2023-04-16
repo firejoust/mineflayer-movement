@@ -152,6 +152,7 @@ bot.movement.heuristic.register('distance')
   .radius(number)    // how far each raycast will travel
   .height(number)    // maximum height that raycasts can climb blocks
   .count(number)     // how many raycasts in a particular direction
+  .avoid(object)     // key/value object mapping avoid block names to booleans
   .increment(number) // distance between block checks
   
 bot.movement.heuristic.register('danger')
@@ -161,9 +162,9 @@ bot.movement.heuristic.register('danger')
   .descent(number)    // maximum depth that raycasts can descend
   .depth(number)      // how deep raycasts can descend from a block
   .count(number)      // how many raycasts in a particular direction
+  .avoid(object)      // key/value object mapping avoid block names to booleans
   .increment(number)  // distance between block checks
-  .avoid(...string[]) // a list of dangerous blocks to avoid
-  
+
 bot.movement.heuristic.register('proximity')
   .weight(number) // multiplier for the final cost
   .target(Vec3)   // the proximity target/destination coordinates
