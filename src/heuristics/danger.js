@@ -171,7 +171,7 @@ module.exports.inject = function inject(bot, Set) {
                                 if (bot.blockAt(lastPos)?.boundingBox === 'block') {
                                     return 0 // no penalty for block obstruction
                                 } else {
-                                    ceilingCheck ||= false // don't stop doing ceiling checks in current iteration
+                                    ceilingCheck = ceilingCheck || false // don't stop doing ceiling checks in current iteration
                                 }
                             }
                         }
