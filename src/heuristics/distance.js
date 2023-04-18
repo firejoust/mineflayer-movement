@@ -176,7 +176,7 @@ module.exports.inject = function inject(bot, Set) {
                                 } else
                                 
                                 // don't stop doing ceiling checks in current iteration
-                                ceilingCheck ||= false
+                                ceilingCheck = ceilingCheck || false
                             }
                         }
                         
